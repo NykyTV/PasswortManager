@@ -24,8 +24,7 @@ public class MainWindow extends JFrame{
     private JTable passwordTable;
     private DefaultTableModel tableModel;
 
-    public MainWindow(String title)
-    {
+    public MainWindow(String title) {
         super(title);
 
         initComponents();

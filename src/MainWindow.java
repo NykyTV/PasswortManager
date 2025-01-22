@@ -101,7 +101,6 @@ public class MainWindow extends JFrame{
         JScrollPane scrollPane = new JScrollPane(passwordTable);
         scrollPane.setPreferredSize(new Dimension(550, 200));
 
-
         mainWindow.add(label_title);
         mainWindow.add(label_nameInput);
         mainWindow.add(textfield_nameInput);

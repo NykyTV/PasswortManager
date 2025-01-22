@@ -20,7 +20,6 @@ public class LoginWindow extends JFrame {
     private JLabel passwortText;
     private JLabel label_title;
     private Boolean darkMode = false;
-
     private static final String CREDENTIALS_FILE = "credentials.json";
 
     public LoginWindow(String title) {
@@ -38,6 +37,7 @@ public class LoginWindow extends JFrame {
 
         addComponents();
         setupActionListeners();
+        activateDarkMode(darkMode);
         setVisible(true);
     }
 

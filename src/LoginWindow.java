@@ -1,11 +1,7 @@
-import javax.lang.model.element.Element;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 public class LoginWindow extends JFrame {
     private JPanel LoginWindow;
@@ -69,6 +65,7 @@ public class LoginWindow extends JFrame {
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         setElementLocation(label_title);
 
+        loginButton.setBackground(Color.WHITE);
 
         setElementLocation(benutzerText);
         setElementLocation(benutzerNameEingabe);
@@ -126,10 +123,10 @@ public class LoginWindow extends JFrame {
 
     private void activateDarkMode(boolean active) {
         if (active) {
-            label_title.setBackground(Color.LIGHT_GRAY);
-            label_title.setBorder(BorderFactory.createLineBorder(Color.BLACK, 0, true));
-            label_title.setOpaque(true);
 
+
+            label_title.setForeground(new Color(173, 216, 230));
+            loginButton.setBackground(Color.LIGHT_GRAY);
             benutzerText.setForeground(Color.LIGHT_GRAY);
             passwortText.setForeground(Color.LIGHT_GRAY);
             setFarbeTextField(benutzerNameEingabe);

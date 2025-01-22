@@ -1,8 +1,6 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.nio.file.*;
@@ -74,10 +72,11 @@ public class LoginWindow extends JFrame {
         label_title.setFont(new Font("Arial", Font.BOLD, 24));
         label_title.setForeground(new Color(0, 102, 204));
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        setElementLocation(label_title);
 
         loginButton.setBackground(Color.WHITE);
 
+        setElementLocation(label_title);
+        setElementLocation(registerButton);
         setElementLocation(benutzerText);
         setElementLocation(benutzerNameEingabe);
         setElementLocation(passwortText);

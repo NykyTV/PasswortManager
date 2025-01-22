@@ -23,6 +23,7 @@ public class MainWindow extends JFrame{
 
     private JTable passwordTable;
     private DefaultTableModel tableModel;
+    private JButton logoutButton;
 
     public MainWindow(String title) {
         super(title);
@@ -43,77 +44,95 @@ public class MainWindow extends JFrame{
     }
 
     private void initComponents() {
-        JPanel mainWindow = new JPanel();
-        mainWindow.setLayout(new BoxLayout(mainWindow, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout());
 
-        // Titel
-        label_title = new JLabel("Passwort Manager");
+        // North Panel (Title and Logout)
+        JPanel northPanel = new JPanel(new BorderLayout());
+        label_title = new JLabel("Passwort Manager", SwingConstants.CENTER);
         label_title.setFont(new Font("Arial", Font.BOLD, 24));
         label_title.setForeground(new Color(0, 102, 204));
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        label_title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        northPanel.add(label_title, BorderLayout.CENTER);
 
-        // Eintrag-Name
+        logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(e -> logout());
+        JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        logoutPanel.add(logoutButton);
+        northPanel.add(logoutPanel, BorderLayout.EAST);
+
+        add(northPanel, BorderLayout.NORTH);
+
+        // Center Panel (Input Fields and Add Button)
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+
         label_nameInput = new JLabel("Name des Eintrags:");
-        label_nameInput.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        textfield_nameInput = new JTextField(20);
         textfield_nameInput = new JTextField(20);
         textfield_nameInput.setMaximumSize(new Dimension(300, 25));
 
-        // Nutzername
         label_usernameInput = new JLabel("Nutzername:");
-        label_usernameInput.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        textfield_usernameInput = new JTextField(20);
         textfield_usernameInput = new JTextField(20);
         textfield_usernameInput.setMaximumSize(new Dimension(300, 25));
 
-        // Passwort Eingabe
         label_pwInput = new JLabel("Passwort:");
-        label_pwInput.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        textfield_pwInput = new JTextField(20);
         textfield_pwInput = new JTextField(20);
         textfield_pwInput.setMaximumSize(new Dimension(300, 25));
 
         button_generate_password = new JButton("GEN");
-        button_generate_password.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String generatedPassword = generatePassword();
-                textfield_pwInput.setText(generatedPassword);
-            }
-        });
-        button_add_password = new JButton("+");
-        button_add_password.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button_add_password.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addPasswordToTable();
-            }
-        });
+        button_generate_password.addActionListener(e -> textfield_pwInput.setText(generatePassword()));
 
-        // Tabelle erstellen
+        button_add_password = new JButton("+");
+        button_add_password.addActionListener(e -> addPasswordToTable());
+
+        // Zentrieren der Komponenten
+        label_nameInput.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textfield_nameInput.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label_usernameInput.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textfield_usernameInput.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label_pwInput.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textfield_pwInput.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button_generate_password.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button_add_password.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        centerPanel.add(Box.createVerticalGlue());
+        centerPanel.add(label_nameInput);
+        centerPanel.add(textfield_nameInput);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        centerPanel.add(label_usernameInput);
+        centerPanel.add(textfield_usernameInput);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        centerPanel.add(label_pwInput);
+        centerPanel.add(textfield_pwInput);
+        centerPanel.add(button_generate_password);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        centerPanel.add(button_add_password);
+        centerPanel.add(Box.createVerticalGlue());
+
+        add(centerPanel, BorderLayout.CENTER);
+
+        // South Panel (Password Table)
         String[] columnNames = {"Name", "Nutzername", "Passwort", "Aktionen"};
         tableModel = new DefaultTableModel(columnNames, 0);
         passwordTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(passwordTable);
-        scrollPane.setPreferredSize(new Dimension(550, 200));
+        add(scrollPane, BorderLayout.SOUTH);
+    }
 
-        mainWindow.add(label_title);
-        mainWindow.add(label_nameInput);
-        mainWindow.add(textfield_nameInput);
-        mainWindow.add(label_usernameInput);
-        mainWindow.add(textfield_usernameInput);
-        mainWindow.add(label_pwInput);
-        mainWindow.add(button_generate_password);
-        mainWindow.add(textfield_pwInput);
-        mainWindow.add(button_add_password);
-        mainWindow.add(Box.createRigidArea(new Dimension(0, 20))); // Abstand
 
-        mainWindow.add(scrollPane);
-        setContentPane(mainWindow);
+    private void logout() {
+        int option = JOptionPane.showConfirmDialog(this,
+                "Möchten Sie sich wirklich abmelden?",
+                "Logout bestätigen",
+                JOptionPane.YES_NO_OPTION);
+
+        if (option == JOptionPane.YES_OPTION) {
+            this.dispose();
+
+            SwingUtilities.invokeLater(() -> {
+                LoginWindow loginWindow = new LoginWindow("Login");
+                loginWindow.setVisible(true);
+            });
+        }
     }
 
     private String generatePassword() {

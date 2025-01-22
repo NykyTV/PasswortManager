@@ -1,5 +1,9 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class MainWindow extends JFrame{
     private JPanel panel1;
@@ -8,13 +12,17 @@ public class MainWindow extends JFrame{
     private JTextField textfield_pwInput;
 
     private JLabel label_nameInput;
-    private JTextField textField_nameInput;
+    private JTextField textfield_nameInput;
 
     private JLabel label_usernameInput;
-    private JTextField textField_usernameInput;
+    private JTextField textfield_usernameInput;
 
     private JButton button_add_password;
+    private JButton button_generate_password;
     private JLabel label_title;
+
+    private JTable passwordTable;
+    private DefaultTableModel tableModel;
 
     public MainWindow(String title)
     {
@@ -50,17 +58,17 @@ public class MainWindow extends JFrame{
         label_nameInput = new JLabel("Name des Eintrags:");
         label_nameInput.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        textField_nameInput = new JTextField(20);
-        textField_nameInput = new JTextField(20);
-        textField_nameInput.setMaximumSize(new Dimension(300, 25));
+        textfield_nameInput = new JTextField(20);
+        textfield_nameInput = new JTextField(20);
+        textfield_nameInput.setMaximumSize(new Dimension(300, 25));
 
         // Nutzername
         label_usernameInput = new JLabel("Nutzername:");
         label_usernameInput.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        textField_usernameInput = new JTextField(20);
-        textField_usernameInput = new JTextField(20);
-        textField_usernameInput.setMaximumSize(new Dimension(300, 25));
+        textfield_usernameInput = new JTextField(20);
+        textfield_usernameInput = new JTextField(20);
+        textfield_usernameInput.setMaximumSize(new Dimension(300, 25));
 
         // Passwort Eingabe
         label_pwInput = new JLabel("Passwort:");
@@ -70,24 +78,79 @@ public class MainWindow extends JFrame{
         textfield_pwInput = new JTextField(20);
         textfield_pwInput.setMaximumSize(new Dimension(300, 25));
 
+        button_generate_password = new JButton("GEN");
+        button_generate_password.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String generatedPassword = generatePassword();
+                textfield_pwInput.setText(generatedPassword);
+            }
+        });
         button_add_password = new JButton("+");
         button_add_password.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button_add_password.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addPasswordToTable();
+            }
+        });
+
+        // Tabelle erstellen
+        String[] columnNames = {"Name", "Nutzername", "Passwort", "Aktionen"};
+        tableModel = new DefaultTableModel(columnNames, 0);
+        passwordTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(passwordTable);
+        scrollPane.setPreferredSize(new Dimension(550, 200));
+
 
         mainWindow.add(label_title);
         mainWindow.add(label_nameInput);
-        mainWindow.add(textField_nameInput);
+        mainWindow.add(textfield_nameInput);
         mainWindow.add(label_usernameInput);
-        mainWindow.add(textField_usernameInput);
+        mainWindow.add(textfield_usernameInput);
         mainWindow.add(label_pwInput);
+        mainWindow.add(button_generate_password);
         mainWindow.add(textfield_pwInput);
         mainWindow.add(button_add_password);
-        //mainWindow.add(Box.createRigidArea(new Dimension(0, 10))); // Abstand
+        mainWindow.add(Box.createRigidArea(new Dimension(0, 20))); // Abstand
 
+        mainWindow.add(scrollPane);
         setContentPane(mainWindow);
     }
 
-    private void generatePassword()
-    {
+    private String generatePassword() {
+        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerCase = "abcdefghijklmnopqrstuvwxyz";
+        String numbers = "0123456789";
+        String specialChars = "!@#$%^&*+-=<>?";
+        String allChars = upperCase + lowerCase + numbers + specialChars;
 
+        StringBuilder password = new StringBuilder();
+        Random random = new Random();
+
+        for (int i = 0; i < 12; i++) {  // Generiert ein 12-stelliges Passwort
+            int index = random.nextInt(allChars.length());
+            password.append(allChars.charAt(index));
+        }
+
+        return password.toString();
+    }
+
+    private void addPasswordToTable() {
+        String name = textfield_nameInput.getText();
+        String username = textfield_usernameInput.getText();
+        String password = textfield_pwInput.getText();
+
+        if (!name.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
+            Object[] rowData = {name, username, password, "Bearbeiten/Löschen"};
+            tableModel.addRow(rowData);
+
+            // Eingabefelder leeren
+            textfield_nameInput.setText("");
+            textfield_usernameInput.setText("");
+            textfield_pwInput.setText("");
+        } else {
+            JOptionPane.showMessageDialog(this, "Bitte füllen Sie alle Felder aus.", "Fehler", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

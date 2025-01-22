@@ -40,4 +40,9 @@ public class MainWindow extends JFrame{
 
         setContentPane(mainWindow);
     }
+
+    private void generatePassword()
+    {
+
+    }
 }

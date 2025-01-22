@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,7 @@ public class LoginWindow extends JFrame {
         this.pack();
         this.setLayout(new BoxLayout(LoginWindow, BoxLayout.Y_AXIS));
 
+
         addComponents();
         setupActionListeners();
 
@@ -60,33 +62,27 @@ public class LoginWindow extends JFrame {
         passwortText = new JLabel("Geben Sie Ihr Passwort ein");
         benutzerNameEingabe = new JTextField(20);
         passwortEingabe = new JTextField(20);
-        loginButton = new JButton("Klick");
+        loginButton = new JButton("Login");
         label_title = new JLabel("Passwort Manager");
         registerButton = new JButton("Register");
+
 
         Dimension textFeldGroesse = new Dimension(270, 20);
         benutzerNameEingabe.setMaximumSize(textFeldGroesse);
         passwortEingabe.setMaximumSize(textFeldGroesse);
 
-// Titel
         label_title.setFont(new Font("Arial", Font.BOLD, 24));
         label_title.setForeground(new Color(0, 102, 204));
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        label_title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        setElementLocation(label_title);
 
-        //loginButton.addActionListener();
+        loginButton.setBackground(Color.WHITE);
 
-        //addAbstand();
-        //LoginWindow.add(Box.createVerticalStrut(20));
-        benutzerText.setAlignmentX(Component.CENTER_ALIGNMENT);
-        benutzerNameEingabe.setAlignmentX(Component.CENTER_ALIGNMENT);
-        passwortText.setAlignmentX(Component.CENTER_ALIGNMENT);
-        passwortEingabe.setAlignmentX(Component.CENTER_ALIGNMENT);
-        loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        registerButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-
-
+        setElementLocation(benutzerText);
+        setElementLocation(benutzerNameEingabe);
+        setElementLocation(passwortText);
+        setElementLocation(passwortEingabe);
+        setElementLocation(loginButton);
 
         LoginWindow.add(label_title);
         addAbstand(60);
@@ -179,6 +175,38 @@ public class LoginWindow extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private void setFarbeTextField(JTextField textFeld) {
+        Border textFeldBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
+        textFeld.setForeground(Color.DARK_GRAY);
+        textFeld.setBackground(Color.LIGHT_GRAY);
+        textFeld.setBorder(textFeldBorder);
+    }
+
+    private void setElementLocation(JButton element) {
+        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+    private void setElementLocation(JTextField element) {
+        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+    private void setElementLocation(JLabel element) {
+        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+
+    private void activateDarkMode(boolean active) {
+        if (active) {
+
+
+            label_title.setForeground(new Color(173, 216, 230));
+            loginButton.setBackground(Color.LIGHT_GRAY);
+            benutzerText.setForeground(Color.LIGHT_GRAY);
+            passwortText.setForeground(Color.LIGHT_GRAY);
+            setFarbeTextField(benutzerNameEingabe);
+            setFarbeTextField(passwortEingabe);
+
+            LoginWindow.setBackground(Color.DARK_GRAY);
         }
     }
 }

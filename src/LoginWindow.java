@@ -1,4 +1,6 @@
+import javax.lang.model.element.Element;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +26,7 @@ public class LoginWindow extends JFrame {
         this.pack();
         this.setLayout(new BoxLayout(LoginWindow, BoxLayout.Y_AXIS));
 
+
         addComponents();
 
         loginButton.addActionListener(new ActionListener() {
@@ -40,7 +43,7 @@ public class LoginWindow extends JFrame {
                 }
             }
         });
-
+        activateDarkMode(false);
         setVisible(true);
     }
 
@@ -52,28 +55,22 @@ public class LoginWindow extends JFrame {
         loginButton = new JButton("Klick");
         label_title = new JLabel("Passwort Manager");
 
+
         Dimension textFeldGroesse = new Dimension(270, 20);
         benutzerNameEingabe.setMaximumSize(textFeldGroesse);
         passwortEingabe.setMaximumSize(textFeldGroesse);
 
-// Titel
         label_title.setFont(new Font("Arial", Font.BOLD, 24));
         label_title.setForeground(new Color(0, 102, 204));
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        label_title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        //loginButton.addActionListener();
-
-        //addAbstand();
-        //LoginWindow.add(Box.createVerticalStrut(20));
-        benutzerText.setAlignmentX(Component.CENTER_ALIGNMENT);
-        benutzerNameEingabe.setAlignmentX(Component.CENTER_ALIGNMENT);
-        passwortText.setAlignmentX(Component.CENTER_ALIGNMENT);
-        passwortEingabe.setAlignmentX(Component.CENTER_ALIGNMENT);
-        loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        setElementLocation(label_title);
 
 
-
+        setElementLocation(benutzerText);
+        setElementLocation(benutzerNameEingabe);
+        setElementLocation(passwortText);
+        setElementLocation(passwortEingabe);
+        setElementLocation(loginButton);
 
         LoginWindow.add(label_title);
         addAbstand(60);
@@ -92,5 +89,37 @@ public class LoginWindow extends JFrame {
 
     private boolean checkLogin(String username, String password) {
         return username.equals("admin") && password.equals("admin");
+    }
+
+    private void setFarbeTextField(JTextField textFeld) {
+        Border textFeldBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
+        textFeld.setForeground(Color.DARK_GRAY);
+        textFeld.setBackground(Color.LIGHT_GRAY);
+        textFeld.setBorder(textFeldBorder);
+    }
+
+    private void setElementLocation(JButton element) {
+        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+    private void setElementLocation(JTextField element) {
+        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+    private void setElementLocation(JLabel element) {
+        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+
+    private void activateDarkMode(boolean active) {
+        if (active) {
+            label_title.setBackground(Color.LIGHT_GRAY);
+            label_title.setBorder(BorderFactory.createLineBorder(Color.BLACK, 0, true));
+            label_title.setOpaque(true);
+
+            benutzerText.setForeground(Color.LIGHT_GRAY);
+            passwortText.setForeground(Color.LIGHT_GRAY);
+            setFarbeTextField(benutzerNameEingabe);
+            setFarbeTextField(passwortEingabe);
+
+            LoginWindow.setBackground(Color.DARK_GRAY);
+        }
     }
 }

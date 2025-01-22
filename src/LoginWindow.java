@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class LoginWindow extends JFrame {
     private JPanel LoginWindow;
@@ -29,14 +31,16 @@ public class LoginWindow extends JFrame {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (checkLogin(benutzerNameEingabe.getText(), passwortEingabe.getText())) {
-                    dispose(); // Schließt das Login-Fenster
-                    SwingUtilities.invokeLater(() -> {
-                        MainWindow mainWindow = new MainWindow("Passwort Manager");
-                        mainWindow.setVisible(true);
-                    });
-                } else {
-                    JOptionPane.showMessageDialog(LoginWindow.this, "Ungültige Anmeldedaten", "Fehler", JOptionPane.ERROR_MESSAGE);
+                performLogin();
+            }
+        });
+
+        // Key Listener für ENTER Taste
+        passwortEingabe.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    performLogin();
                 }
             }
         });
@@ -49,7 +53,7 @@ public class LoginWindow extends JFrame {
         passwortText = new JLabel("Geben Sie Ihr Passwort ein");
         benutzerNameEingabe = new JTextField(20);
         passwortEingabe = new JTextField(20);
-        loginButton = new JButton("Klick");
+        loginButton = new JButton("Login");
         label_title = new JLabel("Passwort Manager");
 
         Dimension textFeldGroesse = new Dimension(270, 20);
@@ -88,6 +92,18 @@ public class LoginWindow extends JFrame {
 
     public void addAbstand(int Abstand) {
         LoginWindow.add(Box.createVerticalStrut(Abstand));
+    }
+
+    private void performLogin() {
+        if (checkLogin(benutzerNameEingabe.getText(), passwortEingabe.getText())) {
+            dispose(); // Schließt das Login-Fenster
+            SwingUtilities.invokeLater(() -> {
+                MainWindow mainWindow = new MainWindow("Passwort Manager");
+                mainWindow.setVisible(true);
+            });
+        } else {
+            JOptionPane.showMessageDialog(LoginWindow.this, "Ungültige Anmeldedaten", "Fehler", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private boolean checkLogin(String username, String password) {

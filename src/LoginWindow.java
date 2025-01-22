@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class LoginWindow extends JFrame {
     private JPanel LoginWindow;
@@ -23,6 +25,23 @@ public class LoginWindow extends JFrame {
         this.setLayout(new BoxLayout(LoginWindow, BoxLayout.Y_AXIS));
 
         addComponents();
+
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (checkLogin(benutzerNameEingabe.getText(), passwortEingabe.getText())) {
+                    dispose(); // Schließt das Login-Fenster
+                    SwingUtilities.invokeLater(() -> {
+                        MainWindow mainWindow = new MainWindow("Passwort Manager");
+                        mainWindow.setVisible(true);
+                    });
+                } else {
+                    JOptionPane.showMessageDialog(LoginWindow.this, "Ungültige Anmeldedaten", "Fehler", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        setVisible(true);
     }
 
     public void addComponents() {
@@ -69,5 +88,9 @@ public class LoginWindow extends JFrame {
 
     public void addAbstand(int Abstand) {
         LoginWindow.add(Box.createVerticalStrut(Abstand));
+    }
+
+    private boolean checkLogin(String username, String password) {
+        return username.equals("admin") && password.equals("admin");
     }
 }

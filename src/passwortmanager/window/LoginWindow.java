@@ -1,3 +1,6 @@
+package passwortmanager.window;
+
+import passwortmanager.utilities.Darkmode;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -10,21 +13,24 @@ import org.json.simple.parser.JSONParser;
 import java.io.StringReader;
 
 public class LoginWindow extends JFrame {
-    private JPanel LoginWindow;
-    private JButton loginButton;
-    private JButton registerButton;
-    private JButton darkModeButton;
-    private JTextField benutzerNameEingabe;
-    private JTextField passwortEingabe;
-    private JLabel benutzerText;
-    private JLabel passwortText;
-    private JLabel label_title;
+
+    private Darkmode darkmodeUtility;
+    public JPanel LoginWindow;
+    public JButton loginButton;
+    public JButton registerButton;
+    public JButton darkModeButton;
+    public JTextField benutzerNameEingabe;
+    public JTextField passwortEingabe;
+    public JLabel benutzerText;
+    public JLabel passwortText;
+    public JLabel label_title;
     private Boolean darkMode = false;
     private static final String CREDENTIALS_FILE = "credentials.json";
 
     public LoginWindow(String title) {
         super(title);
         LoginWindow = new JPanel();
+        darkmodeUtility = new Darkmode(this);
 
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -34,10 +40,9 @@ public class LoginWindow extends JFrame {
         this.pack();
         this.setLayout(new BoxLayout(LoginWindow, BoxLayout.Y_AXIS));
 
-
         addComponents();
         setupActionListeners();
-        activateDarkMode(darkMode);
+        darkmodeUtility.activateDarkMode(darkMode);
         setVisible(true);
     }
 
@@ -124,7 +129,7 @@ public class LoginWindow extends JFrame {
 
     private void performDarkmode() {
         darkMode = !darkMode;
-        activateDarkMode(darkMode);
+        darkmodeUtility.activateDarkMode(darkMode);
     }
 
     private void performRegistration() {
@@ -190,20 +195,6 @@ public class LoginWindow extends JFrame {
         }
     }
 
-    private void setFarbeTextField(JTextField textFeld, boolean darkMode) {
-        if (darkMode) {
-            Border textFeldBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
-            textFeld.setForeground(Color.DARK_GRAY);
-            textFeld.setBackground(Color.LIGHT_GRAY);
-            textFeld.setBorder(textFeldBorder);
-        }else {
-            Border textFeldBorder = BorderFactory.createLineBorder(Color.GRAY);
-            textFeld.setForeground(null);
-            textFeld.setBackground(null);
-            textFeld.setBorder(textFeldBorder);
-        }
-    }
-
     private void setElementLocation(JButton element) {
         element.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
@@ -214,31 +205,5 @@ public class LoginWindow extends JFrame {
         element.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-    private void activateDarkMode(boolean active) {
-        Color buttonFarbe;
-        Color textFarbe;
-        Color titlefarbe;
-        boolean setFarbeTextField;
-        if (active) {
-            buttonFarbe = Color.LIGHT_GRAY;
-            textFarbe = Color.LIGHT_GRAY;
-            titlefarbe = new Color(173, 216, 230);
-            setFarbeTextField = true;
-            LoginWindow.setBackground(Color.DARK_GRAY);
-        }else {
-            buttonFarbe = Color.WHITE;
-            textFarbe = Color.BLACK;
-            titlefarbe = new Color(0, 102, 204);
-            setFarbeTextField = false;
-            LoginWindow.setBackground(null);
-        }
-        loginButton.setBackground(buttonFarbe);
-        darkModeButton.setBackground(buttonFarbe);
-        registerButton.setBackground(buttonFarbe);
-        benutzerText.setForeground(textFarbe);
-        passwortText.setForeground(textFarbe);
-        label_title.setForeground(titlefarbe);
-        setFarbeTextField(benutzerNameEingabe, setFarbeTextField);
-        setFarbeTextField(passwortEingabe, setFarbeTextField);
-    }
+
 }

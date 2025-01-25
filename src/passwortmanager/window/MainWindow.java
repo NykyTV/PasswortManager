@@ -1,3 +1,7 @@
+package passwortmanager.window;
+
+import com.sun.tools.javac.Main;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,6 +10,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 public class MainWindow extends JFrame{
+    private LoginWindow loginUtility;
+
     private JPanel panel1;
 
     private JLabel label_pwInput;
@@ -150,5 +156,9 @@ public class MainWindow extends JFrame{
         } else {
             JOptionPane.showMessageDialog(this, "Bitte füllen Sie alle Felder aus.", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public MainWindow(LoginWindow loginUtility) {
+        this.loginUtility = loginUtility;
     }
 }

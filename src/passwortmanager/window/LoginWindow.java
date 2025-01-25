@@ -24,13 +24,35 @@ public class LoginWindow extends JFrame {
     public JLabel benutzerText;
     public JLabel passwortText;
     public JLabel label_title;
-    private Boolean darkMode = false;
+    private Boolean darkMode;
     private static final String CREDENTIALS_FILE = "credentials.json";
+    private static final String SETTINGS_FILE = "settings.json";
 
     public LoginWindow(String title) {
         super(title);
         LoginWindow = new JPanel();
         darkmodeUtility = new Darkmode(this);
+        try{
+            String test = loadSettings().toString();
+            String test1 = loadSettings().toString();
+            test = test.substring(12, 16);
+            test1 = test1.substring(12, 17);
+            System.out.println(test);
+            switch (test) {
+                case "true":
+                    darkMode = true;
+                    break;
+                default:
+                    break;
+            }
+            switch (test1) {
+                case "false":
+                    darkMode = false;
+                    break;
+                default:
+                    break;
+            }
+        }catch (Exception e) {}
 
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -129,6 +151,7 @@ public class LoginWindow extends JFrame {
 
     private void performDarkmode() {
         darkMode = !darkMode;
+        saveSettings(darkMode);
         darkmodeUtility.activateDarkMode(darkMode);
     }
 
@@ -206,4 +229,37 @@ public class LoginWindow extends JFrame {
     }
 
 
+    private boolean saveSettings(boolean darkMode) {
+        try {
+            JSONObject settings = loadSettings();
+            settings.put("darkMode" ,darkMode);
+            Files.write(Paths.get(SETTINGS_FILE), settings.toString().getBytes());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String getSettings(String username) throws Exception {
+        JSONObject settings = loadSettings();
+        return (String) settings.get(username);
+    }
+
+    private JSONObject loadSettings() throws Exception {
+        if (Files.exists(Paths.get(SETTINGS_FILE))) {
+            String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
+            JSONParser parser = new JSONParser();
+            return (JSONObject) parser.parse(new StringReader(content));
+        }
+        return new JSONObject();
+    }
+
+    public static String removeFirstXCharacters(String input, int x) {
+        // Sicherstellen, dass x nicht größer ist als die Länge des Strings
+        if (input == null || x >= input.length()) {
+            return ""; // Rückgabe eines leeren Strings, wenn x zu groß ist
+        }
+        return input.substring(x); // Gibt den String ab dem Index x zurück
+    }
 }

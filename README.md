@@ -1,7 +1,7 @@
-Passwort Manager
+# Passwort Manager
 
-JDK-22 is required
----
+## JDK-22 is required
+
 ```
 - grafische Oberfläche
 - Verschlüsselung

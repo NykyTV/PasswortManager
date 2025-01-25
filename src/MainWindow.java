@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import java.util.Random;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 public class MainWindow extends JFrame{
     private JPanel panel1;
@@ -116,6 +117,8 @@ public class MainWindow extends JFrame{
         passwordTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(passwordTable);
         add(scrollPane, BorderLayout.SOUTH);
+
+        setupButtonColumn(passwordTable, 3);    // 3 = 3. Spalte (mit 0)
     }
 
 
@@ -158,8 +161,14 @@ public class MainWindow extends JFrame{
         String username = textfield_usernameInput.getText();
         String password = textfield_pwInput.getText();
 
+        JButton deleteButton = new JButton("DEL");
+        deleteButton.addActionListener(e -> {
+            int modelRow = passwordTable.convertRowIndexToModel(passwordTable.getSelectedRow());
+            tableModel.removeRow(modelRow);
+        });
+
         if (!name.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
-            Object[] rowData = {name, username, password, "Bearbeiten/Löschen"};
+            Object[] rowData = {name, username, password, deleteButton};
             tableModel.addRow(rowData);
 
             // Eingabefelder leeren
@@ -169,5 +178,51 @@ public class MainWindow extends JFrame{
         } else {
             JOptionPane.showMessageDialog(this, "Bitte füllen Sie alle Felder aus.", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void setupButtonColumn(JTable table, int column) {
+        table.getColumnModel().getColumn(column).setCellRenderer(new ButtonRenderer());
+        table.getColumnModel().getColumn(column).setCellEditor(new ButtonEditor(new JCheckBox()));
+    }
+}
+
+
+// -------- CUSTOM CLASS to render Button in JTable ---------
+
+class ButtonRenderer extends JButton implements TableCellRenderer {
+    public ButtonRenderer() {
+        setOpaque(true);
+    }
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        if (value instanceof JButton) {
+            return (JButton)value;
+        }
+        return this;
+    }
+}
+
+class ButtonEditor extends DefaultCellEditor {
+    protected JButton button;
+
+    public ButtonEditor(JCheckBox checkBox) {
+        super(checkBox);
+        button = new JButton();
+        button.setOpaque(true);
+        button.addActionListener(e -> fireEditingStopped());
+    }
+
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        if (value instanceof JButton) {
+            button = (JButton)value;
+        }
+        return button;
+    }
+
+    @Override
+    public Object getCellEditorValue() {
+        return button;
     }
 }

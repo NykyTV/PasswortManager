@@ -1,10 +1,6 @@
 package passwortmanager.window;
 
-import com.sun.tools.javac.Main;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Random;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -30,7 +26,6 @@ public class MainWindow extends JFrame{
         setContentPane(MainPanel);
         createTable();
         addListeners();
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);
         setLocationRelativeTo(null);
@@ -167,7 +162,4 @@ class ButtonEditor extends DefaultCellEditor {
         return button.getText();
     }
 
-    public MainWindow(LoginWindow loginUtility) {
-        this.loginUtility = loginUtility;
-    }
 }

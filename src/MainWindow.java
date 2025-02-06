@@ -1,6 +1,4 @@
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Random;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -41,9 +39,9 @@ public class MainWindow extends JFrame{
     }
 
     private void addListeners() {
-        button_logout.addActionListener(e -> logout());
-        button_GeneratePW.addActionListener(e -> textfield_Password.setText(generatePassword()));
-        button_ADD.addActionListener(e -> addPasswordToTable());
+        button_logout.addActionListener(_ -> logout());
+        button_GeneratePW.addActionListener(_ -> textfield_Password.setText(generatePassword()));
+        button_ADD.addActionListener(_ -> addPasswordToTable());
     }
 
 
@@ -141,7 +139,7 @@ class ButtonEditor extends DefaultCellEditor {
         button = new JButton("DEL");
         button.setOpaque(true);
 
-        button.addActionListener(e -> {
+        button.addActionListener(_ -> {
             fireEditingStopped(); // Beende den Bearbeitungsmodus zuerst!
 
             if (row >= 0 && row < table.getRowCount()) { // Sicherstellen, dass die Zeile existiert

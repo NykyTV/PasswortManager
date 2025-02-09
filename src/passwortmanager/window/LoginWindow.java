@@ -1,6 +1,7 @@
 package passwortmanager.window;
 
 import passwortmanager.utilities.Darkmode;
+import passwortmanager.utilities.AES;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -10,6 +11,8 @@ import java.nio.file.*;
 import java.security.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import passwortmanager.utilities.Storage;
+
 import java.io.StringReader;
 
 public class LoginWindow extends JFrame {
@@ -88,7 +91,7 @@ public class LoginWindow extends JFrame {
         benutzerText = new JLabel("Geben Sie Ihren Benutzername ein");
         passwortText = new JLabel("Geben Sie Ihr Passwort ein");
         benutzerNameEingabe = new JTextField(20);
-        passwortEingabe = new JTextField(20);
+        passwortEingabe = new JPasswordField(20);
         loginButton = new JButton("Login");
         darkModeButton = new JButton("Darkmode");
         label_title = new JLabel("Passwort Manager");
@@ -141,7 +144,7 @@ public class LoginWindow extends JFrame {
         if (checkLogin(username, password)) {
             dispose();
             SwingUtilities.invokeLater(() -> {
-                MainWindow mainWindow = new MainWindow("Passwort Manager");
+                MainWindow mainWindow = new MainWindow("Passwort Manager", password);
                 mainWindow.setVisible(true);
             });
         } else {

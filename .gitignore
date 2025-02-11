@@ -29,4 +29,3 @@ bin/
 .DS_Store
 
 /credentials.json
-/settings.json

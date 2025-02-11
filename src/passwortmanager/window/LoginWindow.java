@@ -27,7 +27,7 @@ public class LoginWindow extends JFrame {
     public JLabel benutzerText;
     public JLabel passwortText;
     public JLabel label_title;
-    private Boolean darkMode = false;
+    private Boolean darkMode;
     private static final String CREDENTIALS_FILE = "credentials.json";
     private static final String SETTINGS_FILE = "settings.json";
 

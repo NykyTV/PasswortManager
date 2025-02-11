@@ -18,13 +18,12 @@ public class LoginWindow extends JFrame {
     public JPanel LoginWindow;
     public JButton loginButton;
     public JButton registerButton;
-    public JButton darkModeButton;
     public JTextField benutzerNameEingabe;
     public JTextField passwortEingabe;
     public JLabel benutzerText;
     public JLabel passwortText;
     public JLabel label_title;
-    private Boolean darkMode;
+    public Boolean darkMode = false;
     private static final String CREDENTIALS_FILE = "credentials.json";
     private static final String SETTINGS_FILE = "settings.json";
 
@@ -32,27 +31,27 @@ public class LoginWindow extends JFrame {
         super(title);
         LoginWindow = new JPanel();
         darkmodeUtility = new Darkmode(this);
-        try{
-            String test = loadSettings().toString();
-            String test1 = loadSettings().toString();
-            test = test.substring(12, 16);
-            test1 = test1.substring(12, 17);
-            System.out.println(test);
-            switch (test) {
-                case "true":
-                    darkMode = true;
-                    break;
-                default:
-                    break;
-            }
-            switch (test1) {
-                case "false":
-                    darkMode = false;
-                    break;
-                default:
-                    break;
-            }
-        }catch (Exception e) {}
+//        try{
+//            String test = loadSettings().toString();
+//            String test1 = loadSettings().toString();
+//            test = test.substring(12, 16);
+//            test1 = test1.substring(12, 17);
+//            System.out.println(test);
+//            switch (test) {
+//                case "true":
+//                    darkMode = true;
+//                    break;
+//                default:
+//                    break;
+//            }
+//            switch (test1) {
+//                case "false":
+//                    darkMode = false;
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }catch (Exception e) {}
 
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,7 +69,6 @@ public class LoginWindow extends JFrame {
 
     private void setupActionListeners() {
         loginButton.addActionListener(e -> performLogin());
-        darkModeButton.addActionListener(e -> performDarkmode());
         registerButton.addActionListener(e -> performRegistration());
 
         // Fügen Sie einen KeyListener zum Passwort-Feld hinzu
@@ -90,7 +88,6 @@ public class LoginWindow extends JFrame {
         benutzerNameEingabe = new JTextField(20);
         passwortEingabe = new JTextField(20);
         loginButton = new JButton("Login");
-        darkModeButton = new JButton("Darkmode");
         label_title = new JLabel("Passwort Manager");
         registerButton = new JButton("Register");
 
@@ -105,10 +102,8 @@ public class LoginWindow extends JFrame {
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
         loginButton.setBackground(Color.WHITE);
-        darkModeButton.setBackground(Color.WHITE);
         registerButton.setBackground(Color.WHITE);
 
-        setElementLocation(darkModeButton);
         setElementLocation(label_title);
         setElementLocation(registerButton);
         setElementLocation(benutzerText);
@@ -118,7 +113,6 @@ public class LoginWindow extends JFrame {
         setElementLocation(loginButton);
 
         LoginWindow.add(label_title);
-        LoginWindow.add(darkModeButton);
         addAbstand(30);
         LoginWindow.add(benutzerText);
         LoginWindow.add(benutzerNameEingabe);
@@ -147,12 +141,6 @@ public class LoginWindow extends JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Ungültige Anmeldedaten", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private void performDarkmode() {
-        darkMode = !darkMode;
-        saveSettings(darkMode);
-        darkmodeUtility.activateDarkMode(darkMode);
     }
 
     private void performRegistration() {
@@ -229,17 +217,7 @@ public class LoginWindow extends JFrame {
     }
 
 
-    private boolean saveSettings(boolean darkMode) {
-        try {
-            JSONObject settings = loadSettings();
-            settings.put("darkMode" ,darkMode);
-            Files.write(Paths.get(SETTINGS_FILE), settings.toString().getBytes());
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+
 
     private String getSettings(String username) throws Exception {
         JSONObject settings = loadSettings();

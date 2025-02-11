@@ -1,12 +1,14 @@
 package passwortmanager.utilities;
 
 import passwortmanager.window.LoginWindow;
+import passwortmanager.window.MainWindow;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
 public class Darkmode {
     private LoginWindow loginUtility;
+    private MainWindow mainUtility;
 
     public void activateDarkMode(boolean active) {
         Color buttonFarbe;
@@ -29,7 +31,7 @@ public class Darkmode {
         }
 
         loginUtility.loginButton.setBackground(buttonFarbe);
-        loginUtility.darkModeButton.setBackground(buttonFarbe);
+        mainUtility.darkModeButton.setBackground(buttonFarbe);
         loginUtility.registerButton.setBackground(buttonFarbe);
         loginUtility.benutzerText.setForeground(textFarbe);
         loginUtility.passwortText.setForeground(textFarbe);

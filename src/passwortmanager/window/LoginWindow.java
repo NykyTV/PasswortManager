@@ -1,3 +1,7 @@
+package passwortmanager.window;
+
+import passwortmanager.utilities.Darkmode;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -7,23 +11,50 @@ import java.nio.file.*;
 import java.security.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
 import java.io.StringReader;
 
 public class LoginWindow extends JFrame {
-    private JPanel LoginWindow;
-    private JButton loginButton;
-    private JButton registerButton;
-    private JTextField benutzerNameEingabe;
-    private JTextField passwortEingabe;
-    private JLabel benutzerText;
-    private JLabel passwortText;
-    private JLabel label_title;
 
+    private Darkmode darkmodeUtility;
+    public JPanel LoginWindow;
+    public JButton loginButton;
+    public JButton registerButton;
+    public JButton darkModeButton;
+    public JTextField benutzerNameEingabe;
+    public JTextField passwortEingabe;
+    public JLabel benutzerText;
+    public JLabel passwortText;
+    public JLabel label_title;
+    private Boolean darkMode;
     private static final String CREDENTIALS_FILE = "credentials.json";
+    private static final String SETTINGS_FILE = "settings.json";
 
     public LoginWindow(String title) {
         super(title);
         LoginWindow = new JPanel();
+        darkmodeUtility = new Darkmode(this);
+        try{
+            String test = loadSettings().toString();
+            String test1 = loadSettings().toString();
+            test = test.substring(12, 16);
+            test1 = test1.substring(12, 17);
+            System.out.println(test);
+            switch (test) {
+                case "true":
+                    darkMode = true;
+                    break;
+                default:
+                    break;
+            }
+            switch (test1) {
+                case "false":
+                    darkMode = false;
+                    break;
+                default:
+                    break;
+            }
+        }catch (Exception e) {}
 
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,15 +64,15 @@ public class LoginWindow extends JFrame {
         this.pack();
         this.setLayout(new BoxLayout(LoginWindow, BoxLayout.Y_AXIS));
 
-
         addComponents();
         setupActionListeners();
-
+        darkmodeUtility.activateDarkMode(darkMode);
         setVisible(true);
     }
 
     private void setupActionListeners() {
         loginButton.addActionListener(e -> performLogin());
+        darkModeButton.addActionListener(e -> performDarkmode());
         registerButton.addActionListener(e -> performRegistration());
 
         // Fügen Sie einen KeyListener zum Passwort-Feld hinzu
@@ -59,14 +90,16 @@ public class LoginWindow extends JFrame {
         benutzerText = new JLabel("Geben Sie Ihren Benutzername ein");
         passwortText = new JLabel("Geben Sie Ihr Passwort ein");
         benutzerNameEingabe = new JTextField(20);
-        passwortEingabe = new JTextField(20);
+        passwortEingabe = new JPasswordField(20);
         loginButton = new JButton("Login");
+        darkModeButton = new JButton("Darkmode");
         label_title = new JLabel("Passwort Manager");
         registerButton = new JButton("Register");
 
-
+        Border textFeldBorder = BorderFactory.createLineBorder(Color.GRAY, 1);
         Dimension textFeldGroesse = new Dimension(270, 20);
         benutzerNameEingabe.setMaximumSize(textFeldGroesse);
+        benutzerNameEingabe.setBorder(textFeldBorder);
         passwortEingabe.setMaximumSize(textFeldGroesse);
 
         label_title.setFont(new Font("Arial", Font.BOLD, 24));
@@ -74,7 +107,10 @@ public class LoginWindow extends JFrame {
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
         loginButton.setBackground(Color.WHITE);
+        darkModeButton.setBackground(Color.WHITE);
+        registerButton.setBackground(Color.WHITE);
 
+        setElementLocation(darkModeButton);
         setElementLocation(label_title);
         setElementLocation(registerButton);
         setElementLocation(benutzerText);
@@ -84,7 +120,8 @@ public class LoginWindow extends JFrame {
         setElementLocation(loginButton);
 
         LoginWindow.add(label_title);
-        addAbstand(60);
+        LoginWindow.add(darkModeButton);
+        addAbstand(30);
         LoginWindow.add(benutzerText);
         LoginWindow.add(benutzerNameEingabe);
         addAbstand(20);
@@ -106,12 +143,18 @@ public class LoginWindow extends JFrame {
         if (checkLogin(username, password)) {
             dispose();
             SwingUtilities.invokeLater(() -> {
-                MainWindow mainWindow = new MainWindow("Passwort Manager");
+                MainWindow mainWindow = new MainWindow("Passwort Manager", password);
                 mainWindow.setVisible(true);
             });
         } else {
             JOptionPane.showMessageDialog(this, "Ungültige Anmeldedaten", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void performDarkmode() {
+        darkMode = !darkMode;
+        saveSettings(darkMode);
+        darkmodeUtility.activateDarkMode(darkMode);
     }
 
     private void performRegistration() {
@@ -177,13 +220,6 @@ public class LoginWindow extends JFrame {
         }
     }
 
-    private void setFarbeTextField(JTextField textFeld) {
-        Border textFeldBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
-        textFeld.setForeground(Color.DARK_GRAY);
-        textFeld.setBackground(Color.LIGHT_GRAY);
-        textFeld.setBorder(textFeldBorder);
-    }
-
     private void setElementLocation(JButton element) {
         element.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
@@ -194,18 +230,38 @@ public class LoginWindow extends JFrame {
         element.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-    private void activateDarkMode(boolean active) {
-        if (active) {
 
-
-            label_title.setForeground(new Color(173, 216, 230));
-            loginButton.setBackground(Color.LIGHT_GRAY);
-            benutzerText.setForeground(Color.LIGHT_GRAY);
-            passwortText.setForeground(Color.LIGHT_GRAY);
-            setFarbeTextField(benutzerNameEingabe);
-            setFarbeTextField(passwortEingabe);
-
-            LoginWindow.setBackground(Color.DARK_GRAY);
+    private boolean saveSettings(boolean darkMode) {
+        try {
+            JSONObject settings = loadSettings();
+            settings.put("darkMode" ,darkMode);
+            Files.write(Paths.get(SETTINGS_FILE), settings.toString().getBytes());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
+    }
+
+    private String getSettings(String username) throws Exception {
+        JSONObject settings = loadSettings();
+        return (String) settings.get(username);
+    }
+
+    private JSONObject loadSettings() throws Exception {
+        if (Files.exists(Paths.get(SETTINGS_FILE))) {
+            String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
+            JSONParser parser = new JSONParser();
+            return (JSONObject) parser.parse(new StringReader(content));
+        }
+        return new JSONObject();
+    }
+
+    public static String removeFirstXCharacters(String input, int x) {
+        // Sicherstellen, dass x nicht größer ist als die Länge des Strings
+        if (input == null || x >= input.length()) {
+            return ""; // Rückgabe eines leeren Strings, wenn x zu groß ist
+        }
+        return input.substring(x); // Gibt den String ab dem Index x zurück
     }
 }

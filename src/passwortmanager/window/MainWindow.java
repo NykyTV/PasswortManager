@@ -16,7 +16,6 @@ import javax.swing.table.TableCellRenderer;
 
 public class MainWindow extends JFrame{
 
-    private LoginWindow loginUtility;
     private Darkmode darkmodeUtility;
     private JPanel MainPanel;
     private JLabel label_AppName;
@@ -128,9 +127,9 @@ public class MainWindow extends JFrame{
         setupButtonColumn(passwordTable, 3);
     }
     private void performDarkmode() {
-        loginUtility.darkMode = !loginUtility.darkMode;
-        saveSettings(loginUtility.darkMode);
-        darkmodeUtility.activateDarkMode(loginUtility.darkMode);
+        darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
+        saveSettings(darkmodeUtility.darkMode);
+        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
     }
 
     private boolean saveSettings(boolean darkMode) {

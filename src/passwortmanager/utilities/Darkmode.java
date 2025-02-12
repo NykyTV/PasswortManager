@@ -1,12 +1,15 @@
 package passwortmanager.utilities;
 
 import passwortmanager.window.LoginWindow;
+import passwortmanager.window.MainWindow;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
 public class Darkmode {
     private LoginWindow loginUtility;
+    private MainWindow mainUtility;
+    public Boolean darkMode;
 
     public void activateDarkMode(boolean active) {
         Color buttonFarbe;
@@ -14,28 +17,37 @@ public class Darkmode {
         Color titlefarbe;
         boolean setFarbeTextField;
 
+        //Farben werden gesetzt
         if (active) {
             buttonFarbe = Color.LIGHT_GRAY;
             textFarbe = Color.LIGHT_GRAY;
             titlefarbe = new Color(173, 216, 230);
             setFarbeTextField = true;
-            loginUtility.LoginWindow.setBackground(Color.DARK_GRAY);
+            if (loginUtility != null)
+                loginUtility.LoginWindow.setBackground(Color.DARK_GRAY);
         }else {
             buttonFarbe = Color.WHITE;
             textFarbe = Color.BLACK;
             titlefarbe = new Color(0, 102, 204);
             setFarbeTextField = false;
-            loginUtility.LoginWindow.setBackground(null);
+            if (loginUtility != null)
+                loginUtility.LoginWindow.setBackground(null);
         }
 
-        loginUtility.loginButton.setBackground(buttonFarbe);
-        loginUtility.darkModeButton.setBackground(buttonFarbe);
-        loginUtility.registerButton.setBackground(buttonFarbe);
-        loginUtility.benutzerText.setForeground(textFarbe);
-        loginUtility.passwortText.setForeground(textFarbe);
-        loginUtility.label_title.setForeground(titlefarbe);
-        setFarbeTextField(loginUtility.benutzerNameEingabe, setFarbeTextField);
-        setFarbeTextField(loginUtility.passwortEingabe, setFarbeTextField);
+        //Die Farbe der Komponenten wird geändert
+        if (mainUtility != null) {
+            mainUtility.darkModeButton.setBackground(buttonFarbe);
+        }
+
+        if (loginUtility != null) {
+            loginUtility.loginButton.setBackground(buttonFarbe);
+            loginUtility.registerButton.setBackground(buttonFarbe);
+            loginUtility.benutzerText.setForeground(textFarbe);
+            loginUtility.passwortText.setForeground(textFarbe);
+            loginUtility.label_title.setForeground(titlefarbe);
+            setFarbeTextField(loginUtility.benutzerNameEingabe, setFarbeTextField);
+            setFarbeTextField(loginUtility.passwortEingabe, setFarbeTextField);
+        }
     }
 
     private void setFarbeTextField(JTextField textFeld, boolean darkMode) {
@@ -56,4 +68,7 @@ public class Darkmode {
         this.loginUtility = loginUtility;
     }
 
+    public Darkmode(MainWindow mainUtility) {
+        this.mainUtility = mainUtility;
+    }
 }

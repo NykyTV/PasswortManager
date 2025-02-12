@@ -4,7 +4,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import passwortmanager.utilities.Storage;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import passwortmanager.utilities.Darkmode;
+import passwortmanager.window.LoginWindow;
+
 import java.awt.*;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Random;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -15,6 +23,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 public class MainWindow extends JFrame{
+
+    private Darkmode darkmodeUtility;
 
     // MainWindow.form Variables
     private JPanel MainPanel;
@@ -29,6 +39,8 @@ public class MainWindow extends JFrame{
     private JButton button_GeneratePW;
     private JButton button_ADD;
     private JTable passwordTable;
+    public JButton darkModeButton;
+    private static final String SETTINGS_FILE = "settings.json";
     private JButton button_Save;
     private DefaultTableModel tableModel;
 
@@ -39,6 +51,7 @@ public class MainWindow extends JFrame{
     public MainWindow(String title, String masterPassword) {
         super(title);
         setContentPane(MainPanel);
+        darkmodeUtility = new Darkmode(this);
         createTable();
         addListeners();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,6 +74,7 @@ public class MainWindow extends JFrame{
     }
 
     private void addListeners() {
+        darkModeButton.addActionListener(e -> performDarkmode());
         button_logout.addActionListener(_ -> logout());
         button_GeneratePW.addActionListener(_ -> textfield_Password.setText(generatePassword()));
         button_ADD.addActionListener(_ -> addPasswordToTable());
@@ -198,6 +212,38 @@ public class MainWindow extends JFrame{
         // Button-Renderer und Editor für die letzte Spalte (Aktionen) setzen
         setupButtonColumn(passwordTable, 3);
     }
+    private void performDarkmode() {
+        darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
+        saveSettings(darkmodeUtility.darkMode);
+        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
+    }
+
+    private boolean saveSettings(boolean darkMode) {
+        try {
+            JSONObject settings = loadSettings();
+            settings.put("darkMode" ,darkMode);
+            Files.write(Paths.get(SETTINGS_FILE), settings.toString().getBytes());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String getSettings(String username) throws Exception {
+        JSONObject settings = loadSettings();
+        return (String) settings.get(username);
+    }
+
+    private JSONObject loadSettings() throws Exception {
+        if (Files.exists(Paths.get(SETTINGS_FILE))) {
+            String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
+            JSONParser parser = new JSONParser();
+            return (JSONObject) parser.parse(new StringReader(content));
+        }
+        return new JSONObject();
+    }
+
 
     public DefaultTableModel getPasswordTableModel() {
         return (DefaultTableModel) passwordTable.getModel();

@@ -1,6 +1,7 @@
 package passwortmanager.window;
 
 import passwortmanager.utilities.Darkmode;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -10,6 +11,7 @@ import java.nio.file.*;
 import java.security.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
 import java.io.StringReader;
 
 public class LoginWindow extends JFrame {
@@ -68,6 +70,7 @@ public class LoginWindow extends JFrame {
 
     private void setupActionListeners() {
         loginButton.addActionListener(e -> performLogin());
+        darkModeButton.addActionListener(e -> performDarkmode());
         registerButton.addActionListener(e -> performRegistration());
 
         // Fügen Sie einen KeyListener zum Passwort-Feld hinzu
@@ -85,8 +88,9 @@ public class LoginWindow extends JFrame {
         benutzerText = new JLabel("Geben Sie Ihren Benutzername ein");
         passwortText = new JLabel("Geben Sie Ihr Passwort ein");
         benutzerNameEingabe = new JTextField(20);
-        passwortEingabe = new JTextField(20);
+        passwortEingabe = new JPasswordField(20);
         loginButton = new JButton("Login");
+        darkModeButton = new JButton("Darkmode");
         label_title = new JLabel("Passwort Manager");
         registerButton = new JButton("Register");
 
@@ -101,6 +105,7 @@ public class LoginWindow extends JFrame {
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
         loginButton.setBackground(Color.WHITE);
+        darkModeButton.setBackground(Color.WHITE);
         registerButton.setBackground(Color.WHITE);
 
         setElementLocation(label_title);
@@ -134,12 +139,18 @@ public class LoginWindow extends JFrame {
         if (checkLogin(username, password)) {
             dispose();
             SwingUtilities.invokeLater(() -> {
-                MainWindow mainWindow = new MainWindow("Passwort Manager");
+                MainWindow mainWindow = new MainWindow("Passwort Manager", password);
                 mainWindow.setVisible(true);
             });
         } else {
             JOptionPane.showMessageDialog(this, "Ungültige Anmeldedaten", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void performDarkmode() {
+        darkMode = !darkMode;
+        saveSettings(darkMode);
+        darkmodeUtility.activateDarkMode(darkMode);
     }
 
     private void performRegistration() {
@@ -213,6 +224,19 @@ public class LoginWindow extends JFrame {
     }
     private void setElementLocation(JLabel element) {
         element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+
+
+    private boolean saveSettings(boolean darkMode) {
+        try {
+            JSONObject settings = loadSettings();
+            settings.put("darkMode" ,darkMode);
+            Files.write(Paths.get(SETTINGS_FILE), settings.toString().getBytes());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private String getSettings(String username) throws Exception {

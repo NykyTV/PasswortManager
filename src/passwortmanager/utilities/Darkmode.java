@@ -16,6 +16,7 @@ public class Darkmode {
         Color titlefarbe;
         boolean setFarbeTextField;
 
+        //Farben werden gesetzt
         if (active) {
             buttonFarbe = Color.LIGHT_GRAY;
             textFarbe = Color.LIGHT_GRAY;
@@ -30,12 +31,15 @@ public class Darkmode {
             loginUtility.LoginWindow.setBackground(null);
         }
 
+        //Die Farbe der Komponenten wird geändert
         loginUtility.loginButton.setBackground(buttonFarbe);
-        //mainUtility.darkModeButton.setBackground(buttonFarbe);
+        mainUtility.darkModeButton.setBackground(buttonFarbe);
         loginUtility.registerButton.setBackground(buttonFarbe);
+
         loginUtility.benutzerText.setForeground(textFarbe);
         loginUtility.passwortText.setForeground(textFarbe);
         loginUtility.label_title.setForeground(titlefarbe);
+
         setFarbeTextField(loginUtility.benutzerNameEingabe, setFarbeTextField);
         setFarbeTextField(loginUtility.passwortEingabe, setFarbeTextField);
     }
@@ -57,6 +61,7 @@ public class Darkmode {
     public Darkmode(LoginWindow loginUtility) {
         this.loginUtility = loginUtility;
     }
+
     public Darkmode(MainWindow mainUtility) {
         this.mainUtility = mainUtility;
     }

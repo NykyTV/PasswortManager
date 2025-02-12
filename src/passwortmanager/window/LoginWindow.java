@@ -216,9 +216,6 @@ public class LoginWindow extends JFrame {
         element.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-
-
-
     private String getSettings(String username) throws Exception {
         JSONObject settings = loadSettings();
         return (String) settings.get(username);

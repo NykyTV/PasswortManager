@@ -37,6 +37,7 @@ public class MainWindow extends JFrame{
     public MainWindow(String title) {
         super(title);
         setContentPane(MainPanel);
+        darkmodeUtility = new Darkmode(this);
         createTable();
         addListeners();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -157,6 +158,7 @@ public class MainWindow extends JFrame{
         }
         return new JSONObject();
     }
+
 
 }
 

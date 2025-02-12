@@ -31,7 +31,7 @@ public class Darkmode {
         }
 
         loginUtility.loginButton.setBackground(buttonFarbe);
-        mainUtility.darkModeButton.setBackground(buttonFarbe);
+        //mainUtility.darkModeButton.setBackground(buttonFarbe);
         loginUtility.registerButton.setBackground(buttonFarbe);
         loginUtility.benutzerText.setForeground(textFarbe);
         loginUtility.passwortText.setForeground(textFarbe);
@@ -57,5 +57,7 @@ public class Darkmode {
     public Darkmode(LoginWindow loginUtility) {
         this.loginUtility = loginUtility;
     }
-
+    public Darkmode(MainWindow mainUtility) {
+        this.mainUtility = mainUtility;
+    }
 }

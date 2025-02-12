@@ -1,7 +1,7 @@
 package passwortmanager.window;
 
 import passwortmanager.utilities.Darkmode;
-import passwortmanager.utilities.AES;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -11,7 +11,6 @@ import java.nio.file.*;
 import java.security.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import passwortmanager.utilities.Storage;
 
 import java.io.StringReader;
 

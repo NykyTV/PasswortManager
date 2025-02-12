@@ -16,7 +16,6 @@ import java.io.FileWriter;
 import java.util.Base64;
 
 public class Storage {
-    private static final String FILE_NAME = "passwords.json";
 
     @SuppressWarnings("unchecked")
     public static void savePasswords(MainWindow mainWindow, String masterPassword) {
@@ -47,7 +46,7 @@ public class Storage {
 
             File file = new File("passwords.json");
             if (!file.exists()) {
-                file.createNewFile(); // Datei wird erstellt, falls sie nicht existiert
+                file.createNewFile(); // Datei erstellen falls sie nicht existiert
             }
 
             FileWriter fileWriter = new FileWriter(file);

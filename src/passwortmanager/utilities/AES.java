@@ -1,9 +1,6 @@
 package passwortmanager.utilities;
 
-import org.json.simple.JSONObject;
-
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
@@ -32,13 +29,6 @@ public class AES {
         byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(cipherText));
         return new String(decrypted, StandardCharsets.UTF_8);
     }
-
-    // Methode zur Generierung eines AES-256 Schlüssels
-//    public static SecretKey generateKey() throws Exception {
-//        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-//        keyGenerator.init(KEY_LENGTH);
-//        return keyGenerator.generateKey();
-//    }
 
     // PBKDF2 Schlüsselableitung
     public static SecretKey deriveKeyFromPassword(String password, byte[] salt) throws Exception {

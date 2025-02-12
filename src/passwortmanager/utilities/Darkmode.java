@@ -9,7 +9,7 @@ import java.awt.*;
 public class Darkmode {
     private LoginWindow loginUtility;
     private MainWindow mainUtility;
-    public Boolean darkMode = false;
+    public Boolean darkMode;
 
     public void activateDarkMode(boolean active) {
         Color buttonFarbe;

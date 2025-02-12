@@ -40,7 +40,6 @@ public class MainWindow extends JFrame{
     private JButton button_ADD;
     private JTable passwordTable;
     public JButton darkModeButton;
-    private DefaultTableModel tableModel;
     private static final String SETTINGS_FILE = "settings.json";
     private JButton button_Save;
     private DefaultTableModel tableModel;

@@ -70,7 +70,6 @@ public class LoginWindow extends JFrame {
 
     private void setupActionListeners() {
         loginButton.addActionListener(e -> performLogin());
-        darkModeButton.addActionListener(e -> performDarkmode());
         registerButton.addActionListener(e -> performRegistration());
 
         // Fügen Sie einen KeyListener zum Passwort-Feld hinzu
@@ -90,7 +89,6 @@ public class LoginWindow extends JFrame {
         benutzerNameEingabe = new JTextField(20);
         passwortEingabe = new JPasswordField(20);
         loginButton = new JButton("Login");
-        darkModeButton = new JButton("Darkmode");
         label_title = new JLabel("Passwort Manager");
         registerButton = new JButton("Register");
 
@@ -105,7 +103,6 @@ public class LoginWindow extends JFrame {
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
         loginButton.setBackground(Color.WHITE);
-        darkModeButton.setBackground(Color.WHITE);
         registerButton.setBackground(Color.WHITE);
 
         setElementLocation(label_title);
@@ -148,9 +145,9 @@ public class LoginWindow extends JFrame {
     }
 
     private void performDarkmode() {
-        darkMode = !darkMode;
-        saveSettings(darkMode);
-        darkmodeUtility.activateDarkMode(darkMode);
+        darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
+        saveSettings(darkmodeUtility.darkMode);
+        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
     }
 
     private void performRegistration() {

@@ -12,6 +12,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 public class MainWindow extends JFrame{
@@ -186,17 +187,15 @@ public class MainWindow extends JFrame{
     }
 
 
-    private void setupButtonColumn(JTable table, int column) {
-        table.getColumnModel().getColumn(column).setCellRenderer(new ButtonRenderer());
-        table.getColumnModel().getColumn(column).setCellEditor(new ButtonEditor(new JCheckBox(), table, this));
+    private void setupButtonColumn(JTable table) {
+        table.getColumnModel().getColumn(3).setCellRenderer(new TogglePasswordRenderer());
+        table.getColumnModel().getColumn(3).setCellEditor(new TogglePasswordEditor(table, this));
     }
 
     private void createTable() {
-        // Spalten definieren
         passwordTable.setModel(new DefaultTableModel(null, new String[] {"Name", "Nutzername", "Passwort", "Aktionen"}));
-
-        // Button-Renderer und Editor für die letzte Spalte (Aktionen) setzen
-        setupButtonColumn(passwordTable, 3);
+        setupButtonColumn(passwordTable);
+        passwordTable.setRowHeight(30);
     }
 
     public DefaultTableModel getPasswordTableModel() {
@@ -205,11 +204,15 @@ public class MainWindow extends JFrame{
 
     public void setPasswordTableModel(JSONArray passwordArray) {
         DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
-        model.setRowCount(0); // Löscht alte Daten
-
+        model.setRowCount(0);
         for (Object obj : passwordArray) {
             JSONObject entry = (JSONObject) obj;
-            Object[] rowData = {entry.get("name"), entry.get("username"), entry.get("password"), "DEL"};
+            String name = (String) entry.get("name");
+            String username = (String) entry.get("username");
+            String password = (String) entry.get("password");
+            // Passwort ausblenden
+            String maskedPassword = "*".repeat(password.length());
+            Object[] rowData = {name, username, maskedPassword, "DEL"};
             model.addRow(rowData);
         }
     }
@@ -229,51 +232,82 @@ public class MainWindow extends JFrame{
 
 // -------- CUSTOM CLASS to render Button in JTable ---------
 
-class ButtonRenderer extends JButton implements TableCellRenderer {
-    public ButtonRenderer() {
+class TogglePasswordRenderer extends JPanel implements TableCellRenderer {
+    private JPanel renderPanel;
+    private JButton deleteButton;
+    private JButton toggleButton;
+
+    public TogglePasswordRenderer() {
         setOpaque(true);
+        setLayout(new FlowLayout(FlowLayout.LEFT)); // Explicitly set layout
+
+        renderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        deleteButton = new JButton("DEL");
+        toggleButton = new JButton("Anzeigen");
+
+        renderPanel.add(deleteButton);
+        renderPanel.add(toggleButton);
+
+        deleteButton.setOpaque(true);
+        toggleButton.setOpaque(true);
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        setText((value == null) ? "" : value.toString());
-        return this;
+        return renderPanel;
     }
 }
 
-class ButtonEditor extends DefaultCellEditor {
-    private JButton button;
+class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor {
+    private JPanel editorPanel; // The JPanel to hold the buttons
+    private JButton deleteButton;
+    private JButton toggleButton;
     private JTable table;
     private int row;
     private MainWindow mainWindow;
+    private boolean isPasswordVisible = false;
 
-    public ButtonEditor(JCheckBox checkBox, JTable table, MainWindow mainWindow) {
-        super(checkBox);
+    public TogglePasswordEditor(JTable table, MainWindow mainWindow) {
         this.table = table;
         this.mainWindow = mainWindow;
-        button = new JButton("DEL");
-        button.setOpaque(true);
-
-        button.addActionListener(_ -> {
-            fireEditingStopped(); // Beende den Bearbeitungsmodus zuerst!
-
-            if (row >= 0 && row < table.getRowCount()) { // Sicherstellen, dass die Zeile existiert
+        editorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // Create the JPanel with a layout
+        deleteButton = new JButton("DEL");
+        toggleButton = new JButton("Anzeigen");
+        editorPanel.add(deleteButton); // Add buttons to the JPanel
+        editorPanel.add(toggleButton);
+        deleteButton.setOpaque(true);
+        toggleButton.setOpaque(true);
+        deleteButton.addActionListener(e -> {
+            fireEditingStopped();
+            if (row >= 0 && row < table.getRowCount()) {
                 ((DefaultTableModel) table.getModel()).removeRow(row);
                 mainWindow.setModified(true);
             }
+        });
+        toggleButton.addActionListener(e -> {
+            fireEditingStopped();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            String password = (String) model.getValueAt(row, 2);
+            if (isPasswordVisible) {
+                toggleButton.setText("Anzeigen");
+                table.setValueAt("*".repeat(password.length()), row, 2); // Mask password
+            } else {
+                toggleButton.setText("Ausblenden");
+                table.setValueAt(password, row, 2); // Show password
+            }
+            isPasswordVisible = !isPasswordVisible; // Toggle the visibility state
         });
     }
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         this.row = row;
-        button.setText((value == null) ? "" : value.toString());
-        return button;
+        return editorPanel; // Return the JPanel
     }
 
     @Override
     public Object getCellEditorValue() {
-        return button.getText();
+        return null; // We don't need to return a value in this case
     }
-
 }

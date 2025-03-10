@@ -91,4 +91,36 @@ public class Storage {
         }
     }
 
+    public static String loadPasswordForEntry(String entryName, String masterPassword) {
+        try {
+            File file = new File("passwords.json");
+            JSONParser parser = new JSONParser();
+            JSONObject encryptedObject = (JSONObject) parser.parse(new FileReader(file));
+
+            // Entschlüssele die gesamte Datei
+            String ivString = (String) encryptedObject.get("iv");
+            String saltString = (String) encryptedObject.get("salt");
+            String encryptedJson = (String) encryptedObject.get("data");
+
+            byte[] ivBytes = Base64.getDecoder().decode(ivString);
+            byte[] saltBytes = Base64.getDecoder().decode(saltString);
+            IvParameterSpec iv = new IvParameterSpec(ivBytes);
+
+            SecretKey secretKey = AES.deriveKeyFromPassword(masterPassword, saltBytes);
+            String decryptedJson = AES.decrypt(encryptedJson, secretKey, iv);
+
+            // Suche das spezifische Passwort
+            JSONArray passwordArray = (JSONArray) JSONValue.parse(decryptedJson);
+            for (Object obj : passwordArray) {
+                JSONObject entry = (JSONObject) obj;
+                if (entryName.equals(entry.get("name"))) {
+                    return (String) entry.get("password");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

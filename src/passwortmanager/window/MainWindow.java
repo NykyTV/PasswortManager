@@ -15,6 +15,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import static passwortmanager.utilities.Storage.loadPasswordForEntry;
+
 public class MainWindow extends JFrame{
 
     // MainWindow.form Variables
@@ -34,7 +36,7 @@ public class MainWindow extends JFrame{
     private DefaultTableModel tableModel;
 
     // Local Variables
-    private String m_masterpassword;
+    protected String m_masterpassword;
     private boolean isModified = false; // Speichert, ob Änderungen gemacht wurden
 
     public MainWindow(String title, String masterPassword) {
@@ -260,7 +262,7 @@ class TogglePasswordRenderer extends JPanel implements TableCellRenderer {
 }
 
 class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor {
-    private JPanel editorPanel; // The JPanel to hold the buttons
+    private JPanel editorPanel;
     private JButton deleteButton;
     private JButton toggleButton;
     private JTable table;
@@ -271,10 +273,10 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
     public TogglePasswordEditor(JTable table, MainWindow mainWindow) {
         this.table = table;
         this.mainWindow = mainWindow;
-        editorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // Create the JPanel with a layout
+        editorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         deleteButton = new JButton("DEL");
         toggleButton = new JButton("Anzeigen");
-        editorPanel.add(deleteButton); // Add buttons to the JPanel
+        editorPanel.add(deleteButton);
         editorPanel.add(toggleButton);
         deleteButton.setOpaque(true);
         toggleButton.setOpaque(true);
@@ -288,26 +290,37 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
         toggleButton.addActionListener(e -> {
             fireEditingStopped();
             DefaultTableModel model = (DefaultTableModel) table.getModel();
-            String password = (String) model.getValueAt(row, 2);
+            String name = (String) model.getValueAt(row, 0);
+
             if (isPasswordVisible) {
                 toggleButton.setText("Anzeigen");
-                table.setValueAt("*".repeat(password.length()), row, 2); // Mask password
+                String currentPassword = (String) model.getValueAt(row, 2);
+                model.setValueAt("*".repeat(currentPassword.length()), row, 2);
             } else {
                 toggleButton.setText("Ausblenden");
-                table.setValueAt(password, row, 2); // Show password
+                try {
+                    // Lade das Passwort direkt aus der verschlüsselten Datei
+                    String password = loadPasswordForEntry(name, mainWindow.m_masterpassword);
+                    model.setValueAt(password, row, 2);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(table, "Fehler beim Laden des Passworts",
+                            "Fehler", JOptionPane.ERROR_MESSAGE);
+                }
             }
-            isPasswordVisible = !isPasswordVisible; // Toggle the visibility state
+            isPasswordVisible = !isPasswordVisible;
         });
     }
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         this.row = row;
-        return editorPanel; // Return the JPanel
+        isPasswordVisible = false; // Reset visibility state when editing starts
+        toggleButton.setText("Anzeigen");
+        return editorPanel;
     }
 
     @Override
     public Object getCellEditorValue() {
-        return null; // We don't need to return a value in this case
+        return null;
     }
 }

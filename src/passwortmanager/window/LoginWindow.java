@@ -32,27 +32,6 @@ public class LoginWindow extends JFrame {
         super(title);
         LoginWindow = new JPanel();
         darkmodeUtility = new Darkmode(this);
-        try{
-            String test = loadSettings().toString();
-            String test1 = loadSettings().toString();
-            test = test.substring(12, 16);
-            test1 = test1.substring(12, 17);
-            System.out.println(test);
-            switch (test) {
-                case "true":
-                    darkmodeUtility.darkMode = true;
-                    break;
-                default:
-                    break;
-            }
-            switch (test1) {
-                case "false":
-                    darkmodeUtility.darkMode = false;
-                    break;
-                default:
-                    break;
-            }
-        }catch (Exception e) {}
 
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -241,7 +220,7 @@ public class LoginWindow extends JFrame {
         return (String) settings.get(username);
     }
 
-    private JSONObject loadSettings() throws Exception {
+    public JSONObject loadSettings() throws Exception {
         if (Files.exists(Paths.get(SETTINGS_FILE))) {
             String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
             JSONParser parser = new JSONParser();

@@ -2,18 +2,10 @@ package passwortmanager.window;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import passwortmanager.utilities.Storage;
-
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import passwortmanager.utilities.Darkmode;
-import passwortmanager.window.LoginWindow;
+import passwortmanager.utilities.Storage;
 
-import java.awt.*;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Random;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -21,6 +13,11 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Random;
 
 public class MainWindow extends JFrame{
 
@@ -235,7 +232,7 @@ public class MainWindow extends JFrame{
         return (String) settings.get(username);
     }
 
-    private JSONObject loadSettings() throws Exception {
+    public JSONObject loadSettings() throws Exception {
         if (Files.exists(Paths.get(SETTINGS_FILE))) {
             String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
             JSONParser parser = new JSONParser();

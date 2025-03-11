@@ -2,6 +2,7 @@ package passwortmanager.utilities;
 
 import passwortmanager.window.LoginWindow;
 import passwortmanager.window.MainWindow;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -64,11 +65,64 @@ public class Darkmode {
         }
     }
 
+    public boolean getDarkmode() {
+        try{
+            String tureString = loginUtility.loadSettings().toString();
+            String falseString = loginUtility.loadSettings().toString();
+            tureString = tureString.substring(12, 16);
+            falseString = falseString.substring(12, 17);
+            System.out.println(tureString);
+            System.out.println(falseString);
+            switch (tureString) {
+                case "true":
+                    darkMode = true;
+                    break;
+                default:
+                    break;
+            }
+            switch (falseString) {
+                case "false":
+                    darkMode = false;
+                    break;
+                default:
+                    break;
+            }
+        }catch (Exception e) {}
+        return darkMode;
+    }
+
+    public boolean getDarkmode1() {
+        try{
+            String tureString = mainUtility.loadSettings().toString();
+            String falseString = mainUtility.loadSettings().toString();
+            tureString = tureString.substring(12, 16);
+            falseString = falseString.substring(12, 17);
+            System.out.println(tureString);
+            System.out.println(falseString);
+            switch (tureString) {
+                case "true":
+                    darkMode = true;
+                    break;
+                default:
+                    break;
+            }
+            switch (falseString) {
+                case "false":
+                    darkMode = false;
+                    break;
+                default:
+                    break;
+            }
+        }catch (Exception e) {}
+    }
+
     public Darkmode(LoginWindow loginUtility) {
         this.loginUtility = loginUtility;
+        getDarkmode();
     }
 
     public Darkmode(MainWindow mainUtility) {
         this.mainUtility = mainUtility;
+        getDarkmode1();
     }
 }

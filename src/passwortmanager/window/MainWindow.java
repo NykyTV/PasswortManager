@@ -343,7 +343,6 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
             StringSelection stringSelection = new StringSelection(password);
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
-            JOptionPane.showMessageDialog(table, "Passwort in die Zwischenablage kopiert", "Erfolg", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(table, "Fehler beim Laden des Passworts",
                     "Fehler", JOptionPane.ERROR_MESSAGE);

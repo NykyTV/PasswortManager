@@ -86,7 +86,7 @@ public class MainWindow extends JFrame{
                     );
 
                     if (option == JOptionPane.YES_OPTION) {
-                        Storage.savePasswords(MainWindow.this, m_masterpassword);
+                        Storage.savePasswords(MainWindow.this, m_masterpassword, null, null);
                         System.exit(0);
                     } else if (option == JOptionPane.NO_OPTION) {
                         System.exit(0);
@@ -177,13 +177,16 @@ public class MainWindow extends JFrame{
         String password = textfield_Password.getText();
 
         if (!name.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
-            Object[] rowData = {name, username, password, "DEL"}; // Statt JButton einfach "DEL" als Text speichern
+            String maskedPassword = "*".repeat(password.length());
+            Object[] rowData = {name, username, maskedPassword, "DEL"};
             ((DefaultTableModel) passwordTable.getModel()).addRow(rowData);
+
+            // Save immediately with the actual password
+            Storage.savePasswords(this, m_masterpassword, name, password);
 
             setModified(true);
             button_ADD.setEnabled(false);
 
-            // Eingabefelder leeren
             textfield_EntryName.setText("");
             textfield_Username.setText("");
             textfield_Password.setText("");
@@ -231,7 +234,7 @@ public class MainWindow extends JFrame{
     }
 
     public void save() {
-        Storage.savePasswords(MainWindow.this, m_masterpassword);
+        Storage.savePasswords(MainWindow.this, m_masterpassword, null, null);
         setModified(false);
     }
 }
@@ -278,6 +281,7 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
     private JTable table;
     private int row;
     private MainWindow mainWindow;
+    private String currentPassword; // Speichert das aktuelle Passwort temporär
 
     public TogglePasswordEditor(JTable table, MainWindow mainWindow) {
         this.table = table;
@@ -292,6 +296,7 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
         deleteButton.setOpaque(true);
         toggleButton.setOpaque(true);
         copyButton.setOpaque(true);
+
         deleteButton.addActionListener(e -> {
             fireEditingStopped();
             if (row >= 0 && row < table.getRowCount()) {
@@ -318,10 +323,12 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
     private void showPassword() {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         String name = (String) model.getValueAt(row, 0);
+        String username = (String) model.getValueAt(row, 1);
         try {
-            // Lade das Passwort direkt aus der verschlüsselten Datei
-            String password = loadPasswordForEntry(name, mainWindow.m_masterpassword);
-            model.setValueAt(password, row, 2);
+            currentPassword = loadPasswordForEntry(name, username, mainWindow.m_masterpassword);
+            if (currentPassword != null) {
+                model.setValueAt(currentPassword, row, 2);
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(table, "Fehler beim Laden des Passworts",
                     "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -329,20 +336,23 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
     }
 
     private void hidePassword() {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        String currentPassword = (String) model.getValueAt(row, 2);
-        model.setValueAt("*".repeat(currentPassword.length()), row, 2);
+        if (currentPassword != null) {
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setValueAt("*".repeat(currentPassword.length()), row, 2);
+        }
     }
 
     private void copyPasswordToClipboard() {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         String name = (String) model.getValueAt(row, 0);
+        String username = (String) model.getValueAt(row, 1);
         try {
-            // Load the plaintext password directly from the encrypted file
-            String password = loadPasswordForEntry(name, mainWindow.m_masterpassword);
-            StringSelection stringSelection = new StringSelection(password);
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(stringSelection, null);
+            String password = loadPasswordForEntry(name, username, mainWindow.m_masterpassword);
+            if (password != null) {
+                StringSelection stringSelection = new StringSelection(password);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(table, "Fehler beim Laden des Passworts",
                     "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -352,7 +362,6 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         this.row = row;
-        hidePassword(); // Ensure password is hidden when editing starts
         return editorPanel;
     }
 

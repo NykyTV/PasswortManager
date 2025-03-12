@@ -37,6 +37,7 @@ public class MainWindow extends JFrame{
     private JButton button_ADD;
     private JTable passwordTable;
     private JButton button_Save;
+    private JButton button_Show;
     private DefaultTableModel tableModel;
 
     // Local Variables
@@ -58,6 +59,7 @@ public class MainWindow extends JFrame{
 
         button_ADD.setEnabled(false);
         button_Save.setEnabled(false);
+        button_Show.setText("\uD83D\uDC41"); // "auge icon" setzen da in from Editor nicht möglich
     }
 
     public static void main(String[] args)
@@ -72,6 +74,7 @@ public class MainWindow extends JFrame{
         button_GeneratePW.addActionListener(_ -> textfield_Password.setText(generatePassword()));
         button_ADD.addActionListener(_ -> addPasswordToTable());
         button_Save.addActionListener(_ -> save());
+        button_Show.addActionListener(_ -> togglePasswordVisibility());
 
         // Beim Schließen speichern
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -104,9 +107,32 @@ public class MainWindow extends JFrame{
         passwordTable.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+                if (column == 0) { // Name column
+                    String newName = (String) passwordTable.getValueAt(row, column);
+                    String uniqueName = getUniqueName(newName);
+                    if (!newName.equals(uniqueName)) {
+                        // Temporarily remove the listener to avoid infinite loop
+                        TableModelListener listener = this;
+                        passwordTable.getModel().removeTableModelListener(listener);
+                        JOptionPane.showMessageDialog(MainWindow.this, "Ein Eintrag mit diesem Namen existiert bereits. Der Name wurde geändert zu: " + uniqueName, "Fehler", JOptionPane.ERROR_MESSAGE);
+                        passwordTable.setValueAt(uniqueName, row, column);
+                        // Re-add the listener
+                        passwordTable.getModel().addTableModelListener(listener);
+                    }
+                }
                 button_Save.setEnabled(true);
             }
         });
+    }
+
+    private void togglePasswordVisibility() {
+        if (textfield_Password.getEchoChar() == '\u2022') {
+            textfield_Password.setEchoChar((char) 0); // Show password
+        } else {
+            textfield_Password.setEchoChar('\u2022'); // Hide password
+        }
     }
 
     private void addTextFieldListeners(JTextField textField)
@@ -177,12 +203,14 @@ public class MainWindow extends JFrame{
         String password = textfield_Password.getText();
 
         if (!name.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
+            name = getUniqueName(name);
+
             String maskedPassword = "*".repeat(password.length());
             Object[] rowData = {name, username, maskedPassword, "DEL"};
             ((DefaultTableModel) passwordTable.getModel()).addRow(rowData);
 
             // Save immediately with the actual password
-            Storage.savePasswords(this, m_masterpassword, name, password);
+            //Storage.savePasswords(this, m_masterpassword, name, password);
 
             setModified(true);
             button_ADD.setEnabled(false);
@@ -193,6 +221,29 @@ public class MainWindow extends JFrame{
         } else {
             JOptionPane.showMessageDialog(this, "Bitte füllen Sie alle Felder aus.", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private String getUniqueName(String name) {
+        DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
+        String uniqueName = name;
+        int counter = 1;
+
+        while (isNameDuplicate(uniqueName)) {
+            uniqueName = name + " (" + counter + ")";
+            counter++;
+        }
+
+        return uniqueName;
+    }
+
+    private boolean isNameDuplicate(String name) {
+        DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            if (name.equals(model.getValueAt(i, 0))) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

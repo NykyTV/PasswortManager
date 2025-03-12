@@ -114,6 +114,7 @@ public class Darkmode {
                     break;
             }
         }catch (Exception e) {}
+        return darkMode;
     }
 
     public Darkmode(LoginWindow loginUtility) {

@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.io.StringReader;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
@@ -24,21 +25,24 @@ public class MainWindow extends JFrame{
     private Darkmode darkmodeUtility;
 
     // MainWindow.form Variables
-    private JPanel MainPanel;
-    private JLabel label_AppName;
-    private JButton button_logout;
-    private JLabel label_EntryName;
-    private JTextField textfield_EntryName;
-    private JLabel label_Username;
-    private JTextField textfield_Username;
-    private JLabel label_Password;
-    private JPasswordField textfield_Password;
-    private JButton button_GeneratePW;
-    private JButton button_ADD;
-    private JTable passwordTable;
+    public JPanel MainPanel;
+    public JLabel label_AppName;
+    public JButton button_logout;
+    public JLabel label_EntryName;
+    public JTextField textfield_EntryName;
+    public JLabel label_Username;
+    public JTextField textfield_Username;
+    public JLabel label_Password;
+    public JPasswordField textfield_Password;
+    public JButton button_GeneratePW;
+    public JButton button_ADD;
+    public JTable passwordTable;
     public JButton darkModeButton;
     private static final String SETTINGS_FILE = "settings.json";
-    private JButton button_Save;
+    public JButton button_Save;
+    public JPanel TopPanel;
+    public JPanel MidPanel;
+    public JScrollPane scrollBarPane;
     private DefaultTableModel tableModel;
 
     // Local Variables
@@ -48,6 +52,7 @@ public class MainWindow extends JFrame{
     public MainWindow(String title, String masterPassword) {
         super(title);
         setContentPane(MainPanel);
+        MainPanel.setOpaque(true);
         darkmodeUtility = new Darkmode(this);
         createTable();
         addListeners();
@@ -61,6 +66,8 @@ public class MainWindow extends JFrame{
 
         button_ADD.setEnabled(false);
         button_Save.setEnabled(false);
+
+        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
     }
 
     public static void main(String[] args)

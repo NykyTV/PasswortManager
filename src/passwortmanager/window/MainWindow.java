@@ -210,7 +210,7 @@ public class MainWindow extends JFrame{
             ((DefaultTableModel) passwordTable.getModel()).addRow(rowData);
 
             // Save immediately with the actual password
-            //Storage.savePasswords(this, m_masterpassword, name, password);
+            Storage.savePasswords(this, m_masterpassword, name, password);
 
             setModified(true);
             button_ADD.setEnabled(false);
@@ -332,7 +332,7 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
     private JTable table;
     private int row;
     private MainWindow mainWindow;
-    private String currentPassword; // Speichert das aktuelle Passwort temporär
+    private boolean isPasswordVisible = false;
 
     public TogglePasswordEditor(JTable table, MainWindow mainWindow) {
         this.table = table;
@@ -356,40 +356,29 @@ class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor
             }
         });
 
-        toggleButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                showPassword();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                hidePassword();
-            }
-        });
+        toggleButton.addActionListener(e -> togglePassword());
 
         copyButton.addActionListener(e -> copyPasswordToClipboard());
     }
 
-    private void showPassword() {
+    private void togglePassword() {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         String name = (String) model.getValueAt(row, 0);
         String username = (String) model.getValueAt(row, 1);
-        try {
-            currentPassword = loadPasswordForEntry(name, username, mainWindow.m_masterpassword);
-            if (currentPassword != null) {
-                model.setValueAt(currentPassword, row, 2);
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(table, "Fehler beim Laden des Passworts",
-                    "Fehler", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+        String currentValue = (String) model.getValueAt(row, 2);
+        String realPassword = loadPasswordForEntry(name, username, mainWindow.m_masterpassword);
 
-    private void hidePassword() {
-        if (currentPassword != null) {
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
-            model.setValueAt("*".repeat(currentPassword.length()), row, 2);
+        if (realPassword != null) {
+            isPasswordVisible = !isPasswordVisible; // Toggle the state
+            if (isPasswordVisible) {
+                // Zeige das echte Passwort
+                model.setValueAt(realPassword, row, 2);
+                System.out.println("Entschlüsselt: " + realPassword);
+            } else {
+                // Zeige die Maskierung
+                model.setValueAt("*".repeat(realPassword.length()), row, 2);
+                System.out.println("Verschlüsselt: " + "*".repeat(realPassword.length()));
+            }
         }
     }
 

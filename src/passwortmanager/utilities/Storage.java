@@ -79,6 +79,11 @@ public class Storage {
         File file = new File("passwords.json");
         if (!file.exists()) {
             JOptionPane.showMessageDialog(mainWindow, "Keine gespeicherte Passwort-Datei gefunden.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            try {
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return;
         }
 
@@ -107,14 +112,25 @@ public class Storage {
     }
 
     public static String loadPasswordForEntry(String entryName, String username, String masterPassword) {
+        File file = new File("passwords.json");
+        if (!file.exists() || file.length() == 0) {
+            return null;
+        }
+
         try {
-            File file = new File("passwords.json");
             JSONParser parser = new JSONParser();
             JSONObject encryptedObject = (JSONObject) parser.parse(new FileReader(file));
+            if (encryptedObject == null) {
+                return null;
+            }
 
             String ivString = (String) encryptedObject.get("iv");
             String saltString = (String) encryptedObject.get("salt");
             String encryptedJson = (String) encryptedObject.get("data");
+
+            if (ivString == null || saltString == null || encryptedJson == null) {
+                return null;
+            }
 
             byte[] ivBytes = Base64.getDecoder().decode(ivString);
             byte[] saltBytes = Base64.getDecoder().decode(saltString);
@@ -123,7 +139,6 @@ public class Storage {
             SecretKey secretKey = AES.deriveKeyFromPassword(masterPassword, saltBytes);
             String decryptedJson = AES.decrypt(encryptedJson, secretKey, iv);
 
-            // Suche nach Name UND Benutzername
             JSONArray passwordArray = (JSONArray) JSONValue.parse(decryptedJson);
             for (Object obj : passwordArray) {
                 JSONObject entry = (JSONObject) obj;
@@ -132,9 +147,8 @@ public class Storage {
                     return (String) entry.get("password");
                 }
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Fehler beim Laden des Passworts: " + e.getMessage());
         }
         return null;
     }

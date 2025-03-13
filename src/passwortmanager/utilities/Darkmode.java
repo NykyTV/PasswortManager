@@ -135,51 +135,27 @@ public class Darkmode {
         }
     }
 
+    //Diese Funktion holt den Wert "darkMode" aus der Datei "settings.json"
     public boolean getDarkmode() {
-        try{
-            String tureString = loginUtility.loadSettings().toString();
-            String falseString = loginUtility.loadSettings().toString();
-            tureString = tureString.substring(12, 16);
-            falseString = falseString.substring(12, 17);
-            switch (tureString) {
-                case "true":
+        if (loginUtility != null) {
+            try{
+                String darkModeString = loginUtility.loadSettings().toString().substring(12, 17);
+                if (darkModeString.contains("true")) {
                     darkMode = true;
-                    break;
-                default:
-                    break;
-            }
-            switch (falseString) {
-                case "false":
+                }else if (darkModeString.contains("false")) {
                     darkMode = false;
-                    break;
-                default:
-                    break;
-            }
-        }catch (Exception e) {}
-        return darkMode;
-    }
-
-    public boolean getDarkmode1() {
-        try{
-            String tureString = mainUtility.loadSettings().toString();
-            String falseString = mainUtility.loadSettings().toString();
-            tureString = tureString.substring(12, 16);
-            falseString = falseString.substring(12, 17);
-            switch (tureString) {
-                case "true":
+                }
+            }catch (Exception e) {}
+        }else if (mainUtility != null) {
+            try{
+                String darkModeString = mainUtility.loadSettings().toString().substring(12, 17);
+                if (darkModeString.contains("true")) {
                     darkMode = true;
-                    break;
-                default:
-                    break;
-            }
-            switch (falseString) {
-                case "false":
+                }else if (darkModeString.contains("false")) {
                     darkMode = false;
-                    break;
-                default:
-                    break;
-            }
-        }catch (Exception e) {}
+                }
+            }catch (Exception e) {}
+        }
         return darkMode;
     }
 
@@ -190,6 +166,6 @@ public class Darkmode {
 
     public Darkmode(MainWindow mainUtility) {
         this.mainUtility = mainUtility;
-        getDarkmode1();
+        getDarkmode();
     }
 }

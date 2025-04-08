@@ -3,6 +3,8 @@ package passwortmanager.window;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import passwortmanager.utilities.ButtonEditor;
+import passwortmanager.utilities.ButtonRenderer;
 import passwortmanager.utilities.Darkmode;
 import passwortmanager.utilities.Storage;
 
@@ -12,10 +14,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
 import java.io.StringReader;
-import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
@@ -274,56 +273,4 @@ public class MainWindow extends JFrame{
         Storage.savePasswords(MainWindow.this, m_masterpassword);
         setModified(false);
     }
-}
-
-
-// -------- CUSTOM CLASS to render Button in JTable ---------
-
-class ButtonRenderer extends JButton implements TableCellRenderer {
-    public ButtonRenderer() {
-        setOpaque(true);
-    }
-
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        setText((value == null) ? "" : value.toString());
-        return this;
-    }
-}
-
-class ButtonEditor extends DefaultCellEditor {
-    private JButton button;
-    private JTable table;
-    private int row;
-    private MainWindow mainWindow;
-
-    public ButtonEditor(JCheckBox checkBox, JTable table, MainWindow mainWindow) {
-        super(checkBox);
-        this.table = table;
-        this.mainWindow = mainWindow;
-        button = new JButton("DEL");
-        button.setOpaque(true);
-
-        button.addActionListener(_ -> {
-            fireEditingStopped(); // Beende den Bearbeitungsmodus zuerst!
-
-            if (row >= 0 && row < table.getRowCount()) { // Sicherstellen, dass die Zeile existiert
-                ((DefaultTableModel) table.getModel()).removeRow(row);
-                mainWindow.setModified(true);
-            }
-        });
-    }
-
-    @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        this.row = row;
-        button.setText((value == null) ? "" : value.toString());
-        return button;
-    }
-
-    @Override
-    public Object getCellEditorValue() {
-        return button.getText();
-    }
-
 }

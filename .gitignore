@@ -30,3 +30,4 @@ bin/
 
 /credentials.json
 /passwords.json
+/settings.json

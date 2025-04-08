@@ -1,5 +1,7 @@
 package passwortmanager.window;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import passwortmanager.utilities.Darkmode;
 
 import javax.swing.*;
@@ -7,26 +9,24 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.nio.file.*;
-import java.security.*;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 public class LoginWindow extends JFrame {
 
     private Darkmode darkmodeUtility;
+    public JLabel label_title;
     public JPanel LoginWindow;
     public JButton loginButton;
     public JButton registerButton;
-    public JButton darkModeButton;
     public JTextField benutzerNameEingabe;
     public JTextField passwortEingabe;
     public JLabel benutzerText;
     public JLabel passwortText;
-    public JLabel label_title;
-    private Boolean darkMode;
     private static final String CREDENTIALS_FILE = "credentials.json";
     private static final String SETTINGS_FILE = "settings.json";
 
@@ -34,27 +34,6 @@ public class LoginWindow extends JFrame {
         super(title);
         LoginWindow = new JPanel();
         darkmodeUtility = new Darkmode(this);
-        try{
-            String test = loadSettings().toString();
-            String test1 = loadSettings().toString();
-            test = test.substring(12, 16);
-            test1 = test1.substring(12, 17);
-            System.out.println(test);
-            switch (test) {
-                case "true":
-                    darkMode = true;
-                    break;
-                default:
-                    break;
-            }
-            switch (test1) {
-                case "false":
-                    darkMode = false;
-                    break;
-                default:
-                    break;
-            }
-        }catch (Exception e) {}
 
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -66,13 +45,12 @@ public class LoginWindow extends JFrame {
 
         addComponents();
         setupActionListeners();
-        darkmodeUtility.activateDarkMode(darkMode);
+        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
         setVisible(true);
     }
 
     private void setupActionListeners() {
         loginButton.addActionListener(e -> performLogin());
-        darkModeButton.addActionListener(e -> performDarkmode());
         registerButton.addActionListener(e -> performRegistration());
 
         // Fügen Sie einen KeyListener zum Passwort-Feld hinzu
@@ -87,54 +65,53 @@ public class LoginWindow extends JFrame {
     }
 
     public void addComponents() {
-        benutzerText = new JLabel("Geben Sie Ihren Benutzername ein");
-        passwortText = new JLabel("Geben Sie Ihr Passwort ein");
-        benutzerNameEingabe = new JTextField(20);
-        passwortEingabe = new JPasswordField(20);
-        loginButton = new JButton("Login");
-        darkModeButton = new JButton("Darkmode");
-        label_title = new JLabel("Passwort Manager");
-        registerButton = new JButton("Register");
-
         Border textFeldBorder = BorderFactory.createLineBorder(Color.GRAY, 1);
         Dimension textFeldGroesse = new Dimension(270, 20);
-        benutzerNameEingabe.setMaximumSize(textFeldGroesse);
-        benutzerNameEingabe.setBorder(textFeldBorder);
-        passwortEingabe.setMaximumSize(textFeldGroesse);
 
+        //Buttons
+        loginButton = new JButton("Login");
+        registerButton = new JButton("Register");
+        loginButton.setBackground(Color.WHITE);
+        registerButton.setBackground(Color.WHITE);
+
+        List<JButton> buttonList = java.util.List.of(registerButton, loginButton);
+        setButtonElementLocation(buttonList);
+
+        //JLabels
+        benutzerText = new JLabel("Geben Sie Ihren Benutzername ein");
+        passwortText = new JLabel("Geben Sie Ihr Passwort ein");
+        label_title = new JLabel("Passwort Manager");
         label_title.setFont(new Font("Arial", Font.BOLD, 24));
         label_title.setForeground(new Color(0, 102, 204));
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
-        loginButton.setBackground(Color.WHITE);
-        darkModeButton.setBackground(Color.WHITE);
-        registerButton.setBackground(Color.WHITE);
+        List<JLabel> labelList = java.util.List.of(label_title, benutzerText, passwortText);
+        setLabelElementLocation(labelList);
 
-        setElementLocation(darkModeButton);
-        setElementLocation(label_title);
-        setElementLocation(registerButton);
-        setElementLocation(benutzerText);
-        setElementLocation(benutzerNameEingabe);
-        setElementLocation(passwortText);
-        setElementLocation(passwortEingabe);
-        setElementLocation(loginButton);
+        //JTextField
+        benutzerNameEingabe = new JTextField(20);
+        benutzerNameEingabe.setMaximumSize(textFeldGroesse);
+        benutzerNameEingabe.setBorder(textFeldBorder);
+        passwortEingabe = new JPasswordField(20);
+        passwortEingabe.setMaximumSize(textFeldGroesse);
 
-        LoginWindow.add(label_title);
-        LoginWindow.add(darkModeButton);
-        addAbstand(30);
-        LoginWindow.add(benutzerText);
-        LoginWindow.add(benutzerNameEingabe);
-        addAbstand(20);
-        LoginWindow.add(passwortText);
-        LoginWindow.add(passwortEingabe);
-        addAbstand(75);
-        LoginWindow.add(loginButton);
-        addAbstand(10);
-        LoginWindow.add(registerButton);
+        List<JTextField> textFieldList = java.util.List.of(benutzerNameEingabe, passwortEingabe);
+        setTextFieldElementLocation(textFieldList);
+
+        arrangeComponents();
     }
 
-    public void addAbstand(int Abstand) {
-        LoginWindow.add(Box.createVerticalStrut(Abstand));
+    //Diese Funktion erstellt einen Abstand mit der übergebenen Höhe. Wird in "arrangeComponents()" verwendet.
+    private Component Abstand(int höhe) {
+        return Box.createVerticalStrut(höhe);
+    }
+
+    //Diese Funktion ordnet die Komponenten richtig an.
+    public void arrangeComponents() {
+        List<Component> liste = List.of(label_title, Abstand(30), benutzerText, benutzerNameEingabe, Abstand(20), passwortText, passwortEingabe, Abstand(75), loginButton, Abstand(10), registerButton);
+        for (int i = 0; i < liste.size(); i++) {
+            LoginWindow.add(liste.get(i));
+        }
     }
 
     private void performLogin() {
@@ -152,9 +129,9 @@ public class LoginWindow extends JFrame {
     }
 
     private void performDarkmode() {
-        darkMode = !darkMode;
-        saveSettings(darkMode);
-        darkmodeUtility.activateDarkMode(darkMode);
+        darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
+        saveSettings(darkmodeUtility.darkMode);
+        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
     }
 
     private void performRegistration() {
@@ -220,14 +197,21 @@ public class LoginWindow extends JFrame {
         }
     }
 
-    private void setElementLocation(JButton element) {
-        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    private void setButtonElementLocation(List<JButton> buttonList) {
+        for (int i = 0; i < buttonList.size(); i++) {
+            buttonList.get(i).setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
     }
-    private void setElementLocation(JTextField element) {
-        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+    private void setTextFieldElementLocation(List<JTextField> textFieldList) {
+        for (int i = 0; i < textFieldList.size(); i++) {
+            textFieldList.get(i).setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
     }
-    private void setElementLocation(JLabel element) {
-        element.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    private void setLabelElementLocation(List<JLabel> labelList) {
+        for (int i = 0; i < labelList.size(); i++) {
+            labelList.get(i).setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
     }
 
 
@@ -248,7 +232,7 @@ public class LoginWindow extends JFrame {
         return (String) settings.get(username);
     }
 
-    private JSONObject loadSettings() throws Exception {
+    public JSONObject loadSettings() throws Exception {
         if (Files.exists(Paths.get(SETTINGS_FILE))) {
             String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
             JSONParser parser = new JSONParser();

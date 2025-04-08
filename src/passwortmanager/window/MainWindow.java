@@ -6,12 +6,6 @@ import org.json.simple.parser.JSONParser;
 import passwortmanager.utilities.Darkmode;
 import passwortmanager.utilities.Storage;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Random;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -21,8 +15,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.StringReader;
-import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
@@ -52,6 +47,7 @@ public class MainWindow extends JFrame{
     public JPanel TopPanel;
     public JPanel MidPanel;
     public JScrollPane scrollBarPane;
+    public JButton button_Show;
     private DefaultTableModel tableModel;
 
     // Local Variables

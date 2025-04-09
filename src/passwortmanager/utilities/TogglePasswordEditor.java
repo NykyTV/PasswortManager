@@ -35,7 +35,7 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         toggleButton.setOpaque(true);
         copyButton.setOpaque(true);
 
-        deleteButton.addActionListener(e -> {
+        deleteButton.addActionListener(_ -> {
             int option = JOptionPane.showConfirmDialog(
                     mainWindow,
                     "Möchten Sie das Passwort wirklich löschen?",
@@ -54,9 +54,9 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         });
 
 
-        toggleButton.addActionListener(e -> togglePassword());
+        toggleButton.addActionListener(_ -> togglePassword());
 
-        copyButton.addActionListener(e -> copyPasswordToClipboard());
+        copyButton.addActionListener(_ -> copyPasswordToClipboard());
     }
 
     private void togglePassword() {

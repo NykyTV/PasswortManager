@@ -36,12 +36,23 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         copyButton.setOpaque(true);
 
         deleteButton.addActionListener(e -> {
-            fireEditingStopped();
-            if (row >= 0 && row < table.getRowCount()) {
-                ((DefaultTableModel) table.getModel()).removeRow(row);
-                mainWindow.setModified(true);
+            int option = JOptionPane.showConfirmDialog(
+                    mainWindow,
+                    "Möchten Sie das Passwort wirklich löschen?",
+                    "Löschen bestätigen",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            if (option == JOptionPane.YES_OPTION) {
+                fireEditingStopped();
+                if (row >= 0 && row < table.getRowCount()) {
+                    ((DefaultTableModel) table.getModel()).removeRow(row);
+                    mainWindow.setModified(true);
+                }
             }
         });
+
 
         toggleButton.addActionListener(e -> togglePassword());
 

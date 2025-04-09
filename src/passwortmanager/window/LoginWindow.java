@@ -50,8 +50,8 @@ public class LoginWindow extends JFrame {
     }
 
     private void setupActionListeners() {
-        loginButton.addActionListener(e -> performLogin());
-        registerButton.addActionListener(e -> performRegistration());
+        loginButton.addActionListener(_ -> performLogin());
+        registerButton.addActionListener(_ -> performRegistration());
 
         // Fügen Sie einen KeyListener zum Passwort-Feld hinzu
         passwortEingabe.addKeyListener(new KeyAdapter() {
@@ -198,19 +198,19 @@ public class LoginWindow extends JFrame {
     }
 
     private void setButtonElementLocation(List<JButton> buttonList) {
-        for (int i = 0; i < buttonList.size(); i++) {
-            buttonList.get(i).setAlignmentX(Component.CENTER_ALIGNMENT);
+        for (JButton jButton : buttonList) {
+            jButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         }
     }
     private void setTextFieldElementLocation(List<JTextField> textFieldList) {
-        for (int i = 0; i < textFieldList.size(); i++) {
-            textFieldList.get(i).setAlignmentX(Component.CENTER_ALIGNMENT);
+        for (JTextField jTextField : textFieldList) {
+            jTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
         }
     }
 
     private void setLabelElementLocation(List<JLabel> labelList) {
-        for (int i = 0; i < labelList.size(); i++) {
-            labelList.get(i).setAlignmentX(Component.CENTER_ALIGNMENT);
+        for (JLabel jLabel : labelList) {
+            jLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         }
     }
 

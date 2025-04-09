@@ -3,8 +3,8 @@ package passwortmanager.window;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import passwortmanager.utilities.ButtonEditor;
-import passwortmanager.utilities.ButtonRenderer;
+import passwortmanager.utilities.TogglePasswordEditor;
+import passwortmanager.utilities.TogglePasswordRenderer;
 import passwortmanager.utilities.Darkmode;
 import passwortmanager.utilities.Storage;
 
@@ -18,6 +18,8 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
+
+import static passwortmanager.utilities.Storage.loadPasswordForEntry;
 
 public class MainWindow extends JFrame{
 
@@ -42,10 +44,11 @@ public class MainWindow extends JFrame{
     public JPanel TopPanel;
     public JPanel MidPanel;
     public JScrollPane scrollBarPane;
+    public JButton button_Show;
     private DefaultTableModel tableModel;
 
     // Local Variables
-    private String m_masterpassword;
+    public String m_masterpassword;
     private boolean isModified = false; // Speichert, ob Änderungen gemacht wurden
 
     public MainWindow(String title, String masterPassword) {
@@ -67,6 +70,7 @@ public class MainWindow extends JFrame{
         button_Save.setEnabled(false);
 
         darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
+        button_Show.setText("\uD83D\uDC41"); // "auge icon" setzen da in from Editor nicht möglich
     }
 
     public static void main(String[] args)
@@ -82,6 +86,7 @@ public class MainWindow extends JFrame{
         button_GeneratePW.addActionListener(_ -> textfield_Password.setText(generatePassword()));
         button_ADD.addActionListener(_ -> addPasswordToTable());
         button_Save.addActionListener(_ -> save());
+        button_Show.addActionListener(_ -> togglePasswordVisibility());
 
         // Beim Schließen speichern
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -96,7 +101,7 @@ public class MainWindow extends JFrame{
                     );
 
                     if (option == JOptionPane.YES_OPTION) {
-                        Storage.savePasswords(MainWindow.this, m_masterpassword);
+                        Storage.savePasswords(MainWindow.this, m_masterpassword, null, null);
                         System.exit(0);
                     } else if (option == JOptionPane.NO_OPTION) {
                         System.exit(0);
@@ -114,9 +119,32 @@ public class MainWindow extends JFrame{
         passwordTable.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+                if (column == 0) { // Name column
+                    String newName = (String) passwordTable.getValueAt(row, column);
+                    String uniqueName = getUniqueName(newName);
+                    if (!newName.equals(uniqueName)) {
+                        // Temporarily remove the listener to avoid infinite loop
+                        TableModelListener listener = this;
+                        passwordTable.getModel().removeTableModelListener(listener);
+                        JOptionPane.showMessageDialog(MainWindow.this, "Ein Eintrag mit diesem Namen existiert bereits. Der Name wurde geändert zu: " + uniqueName, "Fehler", JOptionPane.ERROR_MESSAGE);
+                        passwordTable.setValueAt(uniqueName, row, column);
+                        // Re-add the listener
+                        passwordTable.getModel().addTableModelListener(listener);
+                    }
+                }
                 button_Save.setEnabled(true);
             }
         });
+    }
+
+    private void togglePasswordVisibility() {
+        if (textfield_Password.getEchoChar() == '\u2022') {
+            textfield_Password.setEchoChar((char) 0); // Show password
+        } else {
+            textfield_Password.setEchoChar('\u2022'); // Hide password
+        }
     }
 
     private void addTextFieldListeners(JTextField textField)
@@ -187,13 +215,18 @@ public class MainWindow extends JFrame{
         String password = textfield_Password.getText();
 
         if (!name.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
-            Object[] rowData = {name, username, password, "DEL"}; // Statt JButton einfach "DEL" als Text speichern
+            name = getUniqueName(name);
+
+            String maskedPassword = "*".repeat(password.length());
+            Object[] rowData = {name, username, maskedPassword, "DEL"};
             ((DefaultTableModel) passwordTable.getModel()).addRow(rowData);
+
+            // Save immediately with the actual password
+            Storage.savePasswords(this, m_masterpassword, name, password);
 
             setModified(true);
             button_ADD.setEnabled(false);
 
-            // Eingabefelder leeren
             textfield_EntryName.setText("");
             textfield_Username.setText("");
             textfield_Password.setText("");
@@ -202,19 +235,42 @@ public class MainWindow extends JFrame{
         }
     }
 
+    private String getUniqueName(String name) {
+        DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
+        String uniqueName = name;
+        int counter = 1;
 
-    private void setupButtonColumn(JTable table, int column) {
-        table.getColumnModel().getColumn(column).setCellRenderer(new ButtonRenderer());
-        table.getColumnModel().getColumn(column).setCellEditor(new ButtonEditor(new JCheckBox(), table, this));
+        while (isNameDuplicate(uniqueName)) {
+            uniqueName = name + " (" + counter + ")";
+            counter++;
+        }
+
+        return uniqueName;
+    }
+
+    private boolean isNameDuplicate(String name) {
+        DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            if (name.equals(model.getValueAt(i, 0))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private void setupButtonColumn(JTable table) {
+        table.getColumnModel().getColumn(3).setCellRenderer(new TogglePasswordRenderer());
+        table.getColumnModel().getColumn(3).setCellEditor(new TogglePasswordEditor(table, this));
     }
 
     private void createTable() {
-        // Spalten definieren
         passwordTable.setModel(new DefaultTableModel(null, new String[] {"Name", "Nutzername", "Passwort", "Aktionen"}));
-
-        // Button-Renderer und Editor für die letzte Spalte (Aktionen) setzen
-        setupButtonColumn(passwordTable, 3);
+        setupButtonColumn(passwordTable);
+        passwordTable.setRowHeight(35);
+        passwordTable.getColumnModel().getColumn(3).setPreferredWidth(105);
     }
+
     private void performDarkmode() {
         darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
         saveSettings(darkmodeUtility.darkMode);
@@ -254,11 +310,15 @@ public class MainWindow extends JFrame{
 
     public void setPasswordTableModel(JSONArray passwordArray) {
         DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
-        model.setRowCount(0); // Löscht alte Daten
-
+        model.setRowCount(0);
         for (Object obj : passwordArray) {
             JSONObject entry = (JSONObject) obj;
-            Object[] rowData = {entry.get("name"), entry.get("username"), entry.get("password"), "DEL"};
+            String name = (String) entry.get("name");
+            String username = (String) entry.get("username");
+            String password = (String) entry.get("password");
+            // Passwort ausblenden
+            String maskedPassword = "*".repeat(password.length());
+            Object[] rowData = {name, username, maskedPassword, "DEL"};
             model.addRow(rowData);
         }
     }
@@ -270,7 +330,13 @@ public class MainWindow extends JFrame{
     }
 
     public void save() {
-        Storage.savePasswords(MainWindow.this, m_masterpassword);
+        Storage.savePasswords(MainWindow.this, m_masterpassword, null, null);
         setModified(false);
     }
 }
+
+
+// -------- CUSTOM CLASS to render Button in JTable ---------
+
+
+

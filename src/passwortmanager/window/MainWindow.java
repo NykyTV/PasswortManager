@@ -3,6 +3,8 @@ package passwortmanager.window;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import passwortmanager.utilities.ButtonEditor;
+import passwortmanager.utilities.ButtonRenderer;
 import passwortmanager.utilities.Darkmode;
 import passwortmanager.utilities.Storage;
 

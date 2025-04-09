@@ -3,8 +3,8 @@ package passwortmanager.window;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import passwortmanager.utilities.ButtonEditor;
-import passwortmanager.utilities.ButtonRenderer;
+import passwortmanager.utilities.TogglePasswordEditor;
+import passwortmanager.utilities.TogglePasswordRenderer;
 import passwortmanager.utilities.Darkmode;
 import passwortmanager.utilities.Storage;
 
@@ -14,11 +14,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -53,7 +48,7 @@ public class MainWindow extends JFrame{
     private DefaultTableModel tableModel;
 
     // Local Variables
-    protected String m_masterpassword;
+    public String m_masterpassword;
     private boolean isModified = false; // Speichert, ob Änderungen gemacht wurden
 
     public MainWindow(String title, String masterPassword) {
@@ -343,120 +338,5 @@ public class MainWindow extends JFrame{
 
 // -------- CUSTOM CLASS to render Button in JTable ---------
 
-class TogglePasswordRenderer extends JPanel implements TableCellRenderer {
-    private JPanel renderPanel;
-    private JButton deleteButton;
-    private JButton toggleButton;
-    private JButton copyButton;
 
-    public TogglePasswordRenderer() {
-        setOpaque(true);
-        setLayout(new FlowLayout(FlowLayout.LEFT)); // Explicitly set layout
 
-        renderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-        deleteButton = new JButton("DEL");
-        toggleButton = new JButton("\uD83D\uDC41");
-        copyButton = new JButton("\uD83D\uDCC4");
-
-        renderPanel.add(deleteButton);
-        renderPanel.add(toggleButton);
-        renderPanel.add(copyButton);
-
-        deleteButton.setOpaque(true);
-        toggleButton.setOpaque(true);
-        copyButton.setOpaque(true);
-    }
-
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        return renderPanel;
-    }
-}
-
-class TogglePasswordEditor extends AbstractCellEditor implements TableCellEditor {
-    private JPanel editorPanel;
-    private JButton deleteButton;
-    private JButton toggleButton;
-    private JButton copyButton;
-    private JTable table;
-    private int row;
-    private MainWindow mainWindow;
-    private boolean isPasswordVisible = false;
-
-    public TogglePasswordEditor(JTable table, MainWindow mainWindow) {
-        this.table = table;
-        this.mainWindow = mainWindow;
-        editorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        deleteButton = new JButton("DEL");
-        toggleButton = new JButton("\uD83D\uDC41");
-        copyButton = new JButton("\uD83D\uDCC4");
-        editorPanel.add(deleteButton);
-        editorPanel.add(toggleButton);
-        editorPanel.add(copyButton);
-        deleteButton.setOpaque(true);
-        toggleButton.setOpaque(true);
-        copyButton.setOpaque(true);
-
-        deleteButton.addActionListener(e -> {
-            fireEditingStopped();
-            if (row >= 0 && row < table.getRowCount()) {
-                ((DefaultTableModel) table.getModel()).removeRow(row);
-                mainWindow.setModified(true);
-            }
-        });
-
-        toggleButton.addActionListener(e -> togglePassword());
-
-        copyButton.addActionListener(e -> copyPasswordToClipboard());
-    }
-
-    private void togglePassword() {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        String name = (String) model.getValueAt(row, 0);
-        String username = (String) model.getValueAt(row, 1);
-        String currentValue = (String) model.getValueAt(row, 2);
-        String realPassword = loadPasswordForEntry(name, username, mainWindow.m_masterpassword);
-
-        if (realPassword != null) {
-            isPasswordVisible = !isPasswordVisible; // Toggle the state
-            if (isPasswordVisible) {
-                // Zeige das echte Passwort
-                model.setValueAt(realPassword, row, 2);
-                System.out.println("Entschlüsselt: " + realPassword);
-            } else {
-                // Zeige die Maskierung
-                model.setValueAt("*".repeat(realPassword.length()), row, 2);
-                System.out.println("Verschlüsselt: " + "*".repeat(realPassword.length()));
-            }
-        }
-    }
-
-    private void copyPasswordToClipboard() {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        String name = (String) model.getValueAt(row, 0);
-        String username = (String) model.getValueAt(row, 1);
-        try {
-            String password = loadPasswordForEntry(name, username, mainWindow.m_masterpassword);
-            if (password != null) {
-                StringSelection stringSelection = new StringSelection(password);
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(stringSelection, null);
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(table, "Fehler beim Laden des Passworts",
-                    "Fehler", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        this.row = row;
-        return editorPanel;
-    }
-
-    @Override
-    public Object getCellEditorValue() {
-        return null;
-    }
-}

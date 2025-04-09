@@ -43,6 +43,7 @@ public class MainWindow extends JFrame{
     public JPanel MidPanel;
     public JScrollPane scrollBarPane;
     private DefaultTableModel tableModel;
+    ImageIcon icon = new ImageIcon("K:\\Documents\\Java\\PasswortManager\\src\\passwortmanager\\resources\\Pixelart1.jpg");
 
     // Local Variables
     private String m_masterpassword;
@@ -50,6 +51,7 @@ public class MainWindow extends JFrame{
 
     public MainWindow(String title, String masterPassword) {
         super(title);
+        this.setIconImage(icon.getImage());
         setContentPane(MainPanel);
         MainPanel.setOpaque(true);
         darkmodeUtility = new Darkmode(this);

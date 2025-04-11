@@ -49,9 +49,10 @@ public class MainWindow extends JFrame{
 
     // Local Variables
     public String m_masterpassword;
+    public String m_accountName;
     private boolean isModified = false; // Speichert, ob Änderungen gemacht wurden
 
-    public MainWindow(String title, String masterPassword) {
+    public MainWindow(String title, String masterPassword, String accountName) {
         super(title);
         setContentPane(MainPanel);
         MainPanel.setOpaque(true);
@@ -62,8 +63,9 @@ public class MainWindow extends JFrame{
         setSize(600, 800);
         setLocationRelativeTo(null);
         m_masterpassword = masterPassword;
+        m_accountName = accountName;
 
-        Storage.loadPasswords(MainWindow.this, masterPassword);
+        Storage.loadPasswords(MainWindow.this, masterPassword, accountName);
         setVisible(true);
 
         button_ADD.setEnabled(false);
@@ -101,7 +103,7 @@ public class MainWindow extends JFrame{
                     );
 
                     if (option == JOptionPane.YES_OPTION) {
-                        Storage.savePasswords(MainWindow.this, m_masterpassword, null, null);
+                        Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
                         System.exit(0);
                     } else if (option == JOptionPane.NO_OPTION) {
                         System.exit(0);
@@ -222,7 +224,7 @@ public class MainWindow extends JFrame{
             ((DefaultTableModel) passwordTable.getModel()).addRow(rowData);
 
             // Save immediately with the actual password
-            Storage.savePasswords(this, m_masterpassword, name, password);
+            Storage.savePasswords(this, m_masterpassword, m_accountName, name, password);
 
             setModified(true);
             button_ADD.setEnabled(false);
@@ -330,7 +332,7 @@ public class MainWindow extends JFrame{
     }
 
     public void save() {
-        Storage.savePasswords(MainWindow.this, m_masterpassword, null, null);
+        Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
         setModified(false);
     }
 }

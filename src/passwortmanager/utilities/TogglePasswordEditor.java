@@ -54,9 +54,15 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         });
 
 
-        toggleButton.addActionListener(_ -> togglePassword());
+        toggleButton.addActionListener(_ -> {
+            MainWindow.ignoreNextTableChange = true;
+            togglePassword();
+        });
 
-        copyButton.addActionListener(_ -> copyPasswordToClipboard());
+        copyButton.addActionListener(_ -> {
+            MainWindow.ignoreNextTableChange = true;
+            copyPasswordToClipboard();
+        });
     }
 
     private void togglePassword() {
@@ -64,7 +70,7 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         String name = (String) model.getValueAt(row, 0);
         String username = (String) model.getValueAt(row, 1);
         String currentValue = (String) model.getValueAt(row, 2);
-        String realPassword = loadPasswordForEntry(name, username, mainWindow.m_masterpassword);
+        String realPassword = loadPasswordForEntry(name, username, mainWindow.m_masterpassword, mainWindow.m_accountName);
 
         if (realPassword != null) {
             isPasswordVisible = !isPasswordVisible; // Toggle the state
@@ -85,7 +91,7 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         String name = (String) model.getValueAt(row, 0);
         String username = (String) model.getValueAt(row, 1);
         try {
-            String password = loadPasswordForEntry(name, username, mainWindow.m_masterpassword);
+            String password = loadPasswordForEntry(name, username, mainWindow.m_masterpassword, mainWindow.m_accountName);
             if (password != null) {
                 StringSelection stringSelection = new StringSelection(password);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

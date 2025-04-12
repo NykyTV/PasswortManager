@@ -9,8 +9,10 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -120,7 +122,7 @@ public class LoginWindow extends JFrame {
         if (checkLogin(username, password)) {
             dispose();
             SwingUtilities.invokeLater(() -> {
-                MainWindow mainWindow = new MainWindow("Passwort Manager", password);
+                MainWindow mainWindow = new MainWindow("Passwort Manager", password, benutzerNameEingabe.getText());
                 mainWindow.setVisible(true);
             });
         } else {
@@ -137,10 +139,24 @@ public class LoginWindow extends JFrame {
     private void performRegistration() {
         String username = benutzerNameEingabe.getText();
         String password = passwortEingabe.getText();
+        File file = new File(username + ".json");
+
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Benutzername und Passwort dürfen nicht leer sein", "Fehler", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        if (file.exists()) {
+            JOptionPane.showMessageDialog(this, "Benutzername bereits vergeben", "Fehler", JOptionPane.ERROR_MESSAGE);
+            return;
+        } else {
+            try {
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         if (saveCredentials(username, password)) {
             JOptionPane.showMessageDialog(this, "Registrierung erfolgreich", "Erfolg", JOptionPane.INFORMATION_MESSAGE);
         } else {

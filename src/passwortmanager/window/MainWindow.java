@@ -3,10 +3,10 @@ package passwortmanager.window;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import passwortmanager.utilities.TogglePasswordEditor;
-import passwortmanager.utilities.TogglePasswordRenderer;
 import passwortmanager.utilities.Darkmode;
 import passwortmanager.utilities.Storage;
+import passwortmanager.utilities.TogglePasswordEditor;
+import passwortmanager.utilities.TogglePasswordRenderer;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -18,8 +18,6 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
-
-import static passwortmanager.utilities.Storage.loadPasswordForEntry;
 
 public class MainWindow extends JFrame{
 
@@ -83,7 +81,7 @@ public class MainWindow extends JFrame{
     }
 
     private void addListeners() {
-        darkModeButton.addActionListener(e -> performDarkmode());
+        darkModeButton.addActionListener(_ -> performDarkmode());
         button_logout.addActionListener(_ -> logout());
         button_GeneratePW.addActionListener(_ -> textfield_Password.setText(generatePassword()));
         button_ADD.addActionListener(_ -> addPasswordToTable());

@@ -46,7 +46,7 @@ public class Darkmode {
             //Labels
             mainUtility.label_AppName.setForeground(titelFarbe);
             List<JLabel> labelList = List.of(mainUtility.label_EntryName, mainUtility.label_Username, mainUtility.label_Password);
-            setLabelForeground(labelList, textFarbe);;
+            setLabelForeground(labelList, textFarbe);
 
             //Panels
             List<JPanel> panelList = List.of(mainUtility.TopPanel, mainUtility.MidPanel);
@@ -76,7 +76,7 @@ public class Darkmode {
             //Labels
             loginUtility.label_title.setForeground(titelFarbe);
             List<JLabel> labelList = List.of(loginUtility.benutzerText, loginUtility.passwortText);
-            setLabelForeground(labelList, textFarbe);;
+            setLabelForeground(labelList, textFarbe);
 
             //Textfelder
             List<JTextField> textFieldList = List.of(loginUtility.benutzerNameEingabe, loginUtility.passwortEingabe);
@@ -86,22 +86,22 @@ public class Darkmode {
 
     //Diese Funktion setzt den Hintergrund von JButtons.
     private void setButtonBackground(List<JButton> buttonList, Color buttonFarbe) {
-        for (int i = 0; i < buttonList.size(); i++) {
-            buttonList.get(i).setBackground(buttonFarbe);
+        for (JButton jButton : buttonList) {
+            jButton.setBackground(buttonFarbe);
         }
     }
 
     //Diese Funktion setzt den Vordergrund von JLabels.
     private void setLabelForeground(List<JLabel> labelList, Color textFarbe) {
-        for (int i = 0; i < labelList.size(); i++) {
-            labelList.get(i).setForeground(textFarbe);
+        for (JLabel jLabel : labelList) {
+            jLabel.setForeground(textFarbe);
         }
     }
 
     //Diese Funktion setzt den Hintergrund von JPanel.
     private void setPanelBackground(List<JPanel> panelList, Color hintergrundFarbe) {
-        for (int i = 0; i < panelList.size(); i++) {
-            panelList.get(i).setBackground(hintergrundFarbe);
+        for (JPanel jPanel : panelList) {
+            jPanel.setBackground(hintergrundFarbe);
         }
     }
 
@@ -120,17 +120,17 @@ public class Darkmode {
     private void setFarbeTextField(List<JTextField> textFieldList) {
         if (darkMode) {
             Border textFeldBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
-            for (int i = 0; i < textFieldList.size(); i++) {
-                textFieldList.get(i).setForeground(Color.DARK_GRAY);
-                textFieldList.get(i).setBackground(Color.LIGHT_GRAY);
-                textFieldList.get(i).setBorder(textFeldBorder);
+            for (JTextField jTextField : textFieldList) {
+                jTextField.setForeground(Color.DARK_GRAY);
+                jTextField.setBackground(Color.LIGHT_GRAY);
+                jTextField.setBorder(textFeldBorder);
             }
         }else {
             Border textFeldBorder = BorderFactory.createLineBorder(Color.GRAY);
-            for (int i = 0; i < textFieldList.size(); i++) {
-                textFieldList.get(i).setForeground(null);
-                textFieldList.get(i).setBackground(null);
-                textFieldList.get(i).setBorder(textFeldBorder);
+            for (JTextField jTextField : textFieldList) {
+                jTextField.setForeground(null);
+                jTextField.setBackground(null);
+                jTextField.setBorder(textFeldBorder);
             }
         }
     }
@@ -145,7 +145,7 @@ public class Darkmode {
                 }else if (darkModeString.contains("false")) {
                     darkMode = false;
                 }
-            }catch (Exception e) {}
+            }catch (Exception _) {}
         }else if (mainUtility != null) {
             try{
                 String darkModeString = mainUtility.loadSettings().toString().substring(12, 17);
@@ -154,7 +154,7 @@ public class Darkmode {
                 }else if (darkModeString.contains("false")) {
                     darkMode = false;
                 }
-            }catch (Exception e) {}
+            }catch (Exception _) {}
         }
         return darkMode;
     }

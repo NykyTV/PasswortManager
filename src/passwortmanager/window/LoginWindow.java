@@ -111,8 +111,8 @@ public class LoginWindow extends JFrame {
     //Diese Funktion ordnet die Komponenten richtig an.
     public void arrangeComponents() {
         List<Component> liste = List.of(label_title, Abstand(30), benutzerText, benutzerNameEingabe, Abstand(20), passwortText, passwortEingabe, Abstand(75), loginButton, Abstand(10), registerButton);
-        for (int i = 0; i < liste.size(); i++) {
-            LoginWindow.add(liste.get(i));
+        for (Component component : liste) {
+            LoginWindow.add(component);
         }
     }
 

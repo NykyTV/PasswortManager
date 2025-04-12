@@ -45,12 +45,12 @@ public class MainWindow extends JFrame{
     public JPanel MidPanel;
     public JScrollPane scrollBarPane;
     public JButton button_Show;
-    private DefaultTableModel tableModel;
 
     // Local Variables
     public String m_masterpassword;
     public String m_accountName;
     private boolean isModified = false; // Speichert, ob Änderungen gemacht wurden
+    public static boolean ignoreNextTableChange = false;
 
     public MainWindow(String title, String masterPassword, String accountName) {
         super(title);
@@ -59,7 +59,7 @@ public class MainWindow extends JFrame{
         darkmodeUtility = new Darkmode(this);
         createTable();
         addListeners();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(600, 800);
         setLocationRelativeTo(null);
         m_masterpassword = masterPassword;
@@ -121,22 +121,28 @@ public class MainWindow extends JFrame{
         passwordTable.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
+                if (MainWindow.ignoreNextTableChange) {
+                    MainWindow.ignoreNextTableChange = false; // Zurücksetzen
+                    return;
+                }
+
                 int row = e.getFirstRow();
                 int column = e.getColumn();
                 if (column == 0) { // Name column
                     String newName = (String) passwordTable.getValueAt(row, column);
                     String uniqueName = getUniqueName(newName);
                     if (!newName.equals(uniqueName)) {
-                        // Temporarily remove the listener to avoid infinite loop
                         TableModelListener listener = this;
                         passwordTable.getModel().removeTableModelListener(listener);
                         JOptionPane.showMessageDialog(MainWindow.this, "Ein Eintrag mit diesem Namen existiert bereits. Der Name wurde geändert zu: " + uniqueName, "Fehler", JOptionPane.ERROR_MESSAGE);
                         passwordTable.setValueAt(uniqueName, row, column);
-                        // Re-add the listener
                         passwordTable.getModel().addTableModelListener(listener);
                     }
                 }
-                button_Save.setEnabled(true);
+                if (column >= 0 && column <= 2) {
+                    isModified = true;
+                    button_Save.setEnabled(true);
+                }
             }
         });
     }
@@ -184,6 +190,19 @@ public class MainWindow extends JFrame{
                 JOptionPane.YES_NO_OPTION);
 
         if (option == JOptionPane.YES_OPTION) {
+            if (isModified) {
+                int changes = JOptionPane.showConfirmDialog(
+                        MainWindow.this,
+                        "Es gibt ungespeicherte Änderungen. Möchten Sie diese speichern?",
+                        "Änderungen speichern?",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (changes == JOptionPane.YES_OPTION) {
+                    Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
+                }
+            }
+
             this.dispose();
 
             SwingUtilities.invokeLater(() -> {

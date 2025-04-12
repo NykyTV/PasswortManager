@@ -54,9 +54,15 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         });
 
 
-        toggleButton.addActionListener(e -> togglePassword());
+        toggleButton.addActionListener(e -> {
+            MainWindow.ignoreNextTableChange = true;
+            togglePassword();
+        });
 
-        copyButton.addActionListener(e -> copyPasswordToClipboard());
+        copyButton.addActionListener(e -> {
+            MainWindow.ignoreNextTableChange = true;
+            copyPasswordToClipboard();
+        });
     }
 
     private void togglePassword() {

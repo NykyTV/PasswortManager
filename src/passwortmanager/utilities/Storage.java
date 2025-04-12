@@ -18,7 +18,7 @@ import java.util.Base64;
 public class Storage {
 
     @SuppressWarnings("unchecked")
-    public static void savePasswords(MainWindow mainWindow, String masterPassword, String newEntryName, String newPassword) {
+    public static void savePasswords(MainWindow mainWindow, String masterPassword, String accountName, String newEntryName, String newPassword) {
         JSONArray passwordArray = new JSONArray();
         DefaultTableModel model = mainWindow.getPasswordTableModel();
 
@@ -33,7 +33,7 @@ public class Storage {
                 password = newPassword;
             } else {
                 // For existing entries, load the actual password
-                password = loadPasswordForEntry(name, username, masterPassword);
+                password = loadPasswordForEntry(name, username, masterPassword, accountName);
                 if (password == null) {
                     password = (String) model.getValueAt(i, 2);
                 }
@@ -59,9 +59,15 @@ public class Storage {
             encryptedObject.put("salt", Base64.getEncoder().encodeToString(salt));
             encryptedObject.put("data", encryptedJson);
 
-            File file = new File("passwords.json");
+            File file = new File(accountName + ".json");
             if (!file.exists()) {
-                file.createNewFile();
+                JOptionPane.showMessageDialog(mainWindow, "Keine gespeicherte Passwort-Datei gefunden.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    file.createNewFile();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return;
             }
 
             FileWriter fileWriter = new FileWriter(file);
@@ -75,8 +81,8 @@ public class Storage {
         }
     }
 
-    public static void loadPasswords(MainWindow mainWindow, String masterPassword) {
-        File file = new File("passwords.json");
+    public static void loadPasswords(MainWindow mainWindow, String masterPassword, String accountName) {
+        File file = new File(accountName + ".json");
         if (!file.exists()) {
             JOptionPane.showMessageDialog(mainWindow, "Keine gespeicherte Passwort-Datei gefunden.", "Info", JOptionPane.INFORMATION_MESSAGE);
             try {
@@ -90,6 +96,14 @@ public class Storage {
         try {
             JSONParser parser = new JSONParser();
             JSONObject encryptedObject = (JSONObject) parser.parse(new FileReader(file));
+
+            if (encryptedObject == null ||
+                    encryptedObject.get("iv") == null ||
+                    encryptedObject.get("salt") == null ||
+                    encryptedObject.get("data") == null) {
+                //JOptionPane.showMessageDialog(mainWindow, "Die Passwortdatei ist leer oder beschädigt.", "Fehler", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
             String ivString = (String) encryptedObject.get("iv");
             String saltString = (String) encryptedObject.get("salt");
@@ -111,8 +125,8 @@ public class Storage {
         }
     }
 
-    public static String loadPasswordForEntry(String entryName, String username, String masterPassword) {
-        File file = new File("passwords.json");
+    public static String loadPasswordForEntry(String entryName, String username, String masterPassword, String accountName) {
+        File file = new File(accountName + ".json");
         if (!file.exists() || file.length() == 0) {
             return null;
         }

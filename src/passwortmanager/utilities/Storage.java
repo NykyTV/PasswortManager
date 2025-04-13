@@ -79,18 +79,25 @@ public class Storage {
             e.printStackTrace();
             JOptionPane.showMessageDialog(mainWindow, "Fehler beim Speichern!", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
+
+        if (SettingsLoader.isServerMode())
+        {
+            Database.saveUserFileToDatabase(accountName, new File(accountName + ".json"));
+        }
     }
 
     public static void loadPasswords(MainWindow mainWindow, String masterPassword, String accountName) {
         File file = new File(accountName + ".json");
+
+        if (SettingsLoader.isServerMode()) {
+            Database.loadUserFileFromDatabase(accountName, file);
+        }
+
         if (!file.exists()) {
-            JOptionPane.showMessageDialog(mainWindow, "Keine gespeicherte Passwort-Datei gefunden.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            try {
-                file.createNewFile();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (!file.exists() || file.length() == 0) {
+                JOptionPane.showMessageDialog(mainWindow, "Keine gespeicherte Passwort-Datei gefunden.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                return;
             }
-            return;
         }
 
         try {

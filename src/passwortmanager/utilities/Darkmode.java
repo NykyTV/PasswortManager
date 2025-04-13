@@ -40,7 +40,7 @@ public class Darkmode {
         //Hier werden die Farben der Komponenten im Mainwindow angepasst.
         if (mainUtility != null) {
             //Buttons
-            List<JButton> buttonList = List.of(mainUtility.button_logout, mainUtility.darkModeButton, mainUtility.button_GeneratePW, mainUtility.button_ADD, mainUtility.button_Save);
+            List<JButton> buttonList = List.of(mainUtility.button_logout, mainUtility.button_GeneratePW, mainUtility.button_ADD, mainUtility.button_Save);
             setButtonBackground(buttonList, buttonFarbe);
 
             //Labels
@@ -139,21 +139,11 @@ public class Darkmode {
     public boolean getDarkmode() {
         if (loginUtility != null) {
             try{
-                String darkModeString = loginUtility.loadSettings().toString().substring(12, 17);
-                if (darkModeString.contains("true")) {
-                    darkMode = true;
-                }else if (darkModeString.contains("false")) {
-                    darkMode = false;
-                }
+                darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
             }catch (Exception _) {}
         }else if (mainUtility != null) {
             try{
-                String darkModeString = mainUtility.loadSettings().toString().substring(12, 17);
-                if (darkModeString.contains("true")) {
-                    darkMode = true;
-                }else if (darkModeString.contains("false")) {
-                    darkMode = false;
-                }
+                darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
             }catch (Exception _) {}
         }
         return darkMode;

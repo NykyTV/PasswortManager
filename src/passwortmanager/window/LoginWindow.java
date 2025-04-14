@@ -3,6 +3,7 @@ package passwortmanager.window;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import passwortmanager.utilities.Darkmode;
+import passwortmanager.utilities.SettingsLoader;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -130,12 +131,6 @@ public class LoginWindow extends JFrame {
         }
     }
 
-    private void performDarkmode() {
-        darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
-        saveSettings(darkmodeUtility.darkMode);
-        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
-    }
-
     private void performRegistration() {
         String username = benutzerNameEingabe.getText();
         String password = passwortEingabe.getText();
@@ -227,19 +222,6 @@ public class LoginWindow extends JFrame {
     private void setLabelElementLocation(List<JLabel> labelList) {
         for (JLabel jLabel : labelList) {
             jLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        }
-    }
-
-
-    private boolean saveSettings(boolean darkMode) {
-        try {
-            JSONObject settings = loadSettings();
-            settings.put("darkMode" ,darkMode);
-            Files.write(Paths.get(SETTINGS_FILE), settings.toString().getBytes());
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
     }
 

@@ -3,10 +3,7 @@ package passwortmanager.window;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import passwortmanager.utilities.Darkmode;
-import passwortmanager.utilities.Storage;
-import passwortmanager.utilities.TogglePasswordEditor;
-import passwortmanager.utilities.TogglePasswordRenderer;
+import passwortmanager.utilities.*;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -36,13 +33,14 @@ public class MainWindow extends JFrame{
     public JButton button_GeneratePW;
     public JButton button_ADD;
     public JTable passwordTable;
-    public JButton darkModeButton;
     private static final String SETTINGS_FILE = "settings.json";
     public JButton button_Save;
     public JPanel TopPanel;
     public JPanel MidPanel;
     public JScrollPane scrollBarPane;
     public JButton button_Show;
+    private JButton settingsButton;
+    private JLabel statusLabel;
 
     // Local Variables
     public String m_masterpassword;
@@ -81,12 +79,19 @@ public class MainWindow extends JFrame{
     }
 
     private void addListeners() {
-        darkModeButton.addActionListener(_ -> performDarkmode());
         button_logout.addActionListener(_ -> logout());
         button_GeneratePW.addActionListener(_ -> textfield_Password.setText(generatePassword()));
         button_ADD.addActionListener(_ -> addPasswordToTable());
         button_Save.addActionListener(_ -> save());
         button_Show.addActionListener(_ -> togglePasswordVisibility());
+        settingsButton.addActionListener(_ -> {
+            try {
+                String settings = getSettings(m_accountName);
+                SettingsLoader.showSettingsDialog(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         // Beim Schließen speichern
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -290,22 +295,9 @@ public class MainWindow extends JFrame{
         passwordTable.getColumnModel().getColumn(3).setPreferredWidth(105);
     }
 
-    private void performDarkmode() {
+    public void performDarkmode() {
         darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
-        saveSettings(darkmodeUtility.darkMode);
         darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
-    }
-
-    private boolean saveSettings(boolean darkMode) {
-        try {
-            JSONObject settings = loadSettings();
-            settings.put("darkMode" ,darkMode);
-            Files.write(Paths.get(SETTINGS_FILE), settings.toString().getBytes());
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     private String getSettings(String username) throws Exception {
@@ -352,10 +344,8 @@ public class MainWindow extends JFrame{
         Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
         setModified(false);
     }
+
+    public void setStatus(String status) {
+        SwingUtilities.invokeLater(() -> statusLabel.setText(status));
+    }
 }
-
-
-// -------- CUSTOM CLASS to render Button in JTable ---------
-
-
-

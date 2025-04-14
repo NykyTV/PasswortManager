@@ -80,17 +80,33 @@ public class Storage {
             JOptionPane.showMessageDialog(mainWindow, "Fehler beim Speichern!", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
 
-        if (SettingsLoader.isServerMode())
-        {
-            Database.saveUserFileToDatabase(accountName, new File(accountName + ".json"));
+        if (SettingsLoader.isServerMode()) {
+            JSONObject settings = SettingsLoader.loadSettings();
+            String serverUrl = extractHostFromUrl((String) settings.get("url"));
+
+            if (Database.isServerAvailable(serverUrl, mainWindow)) {
+                Database.saveUserFileToDatabase(accountName, new File(accountName + ".json"), mainWindow);
+            } else {
+                JOptionPane.showMessageDialog(mainWindow, "Server nicht erreichbar. Änderungen wurden lokal gespeichert und werden später synchronisiert.", "Offline-Modus", JOptionPane.WARNING_MESSAGE);
+                mainWindow.setStatus("<html><font color='red'>❌ Server nicht erreichbar. Lokale Speicherung aktiv</font></html>");
+                AutoSync.scheduleSync(accountName, mainWindow);
+            }
         }
+
     }
 
     public static void loadPasswords(MainWindow mainWindow, String masterPassword, String accountName) {
         File file = new File(accountName + ".json");
 
         if (SettingsLoader.isServerMode()) {
-            Database.loadUserFileFromDatabase(accountName, file);
+            JSONObject settings = SettingsLoader.loadSettings();
+            String serverUrl = extractHostFromUrl((String) settings.get("url"));
+
+            if (Database.isServerAvailable(serverUrl, mainWindow)) {
+                Database.loadUserFileFromDatabase(accountName, file, mainWindow);
+            } else {
+                JOptionPane.showMessageDialog(mainWindow, "Server nicht erreichbar. Offline-Modus wird verwendet.", "Offline-Modus", JOptionPane.WARNING_MESSAGE);
+            }
         }
 
         if (!file.exists()) {
@@ -173,4 +189,14 @@ public class Storage {
         }
         return null;
     }
+
+    private static String extractHostFromUrl(String url) {
+        // z.B. jdbc:mysql://localhost:3306/dbname
+        try {
+            return url.split("//")[1].split(":")[0]; // "localhost"
+        } catch (Exception e) {
+            return "localhost";
+        }
+    }
+
 }

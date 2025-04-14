@@ -1,11 +1,12 @@
 package passwortmanager.utilities;
 
 import org.json.simple.JSONObject;
+import passwortmanager.window.MainWindow;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import javax.swing.*;
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.sql.*;
 
 public class Database {
@@ -22,9 +23,24 @@ public class Database {
         String user = (String) settings.get("user");
         String password = (String) settings.get("password");
 
-        Connection conn = DriverManager.getConnection(url, user, password);
-        createTableIfNotExists(conn); // <-- Hier Tabelle automatisch anlegen
-        return conn;
+        try {
+            Connection conn = DriverManager.getConnection(url, user, password);
+            createTableIfNotExists(conn);
+            return conn;
+        } catch (SQLException e) {
+            if (e.getMessage().contains("Access denied")) {
+                JOptionPane.showMessageDialog(null,
+                        "Zugriff auf die Datenbank verweigert.\nBitte überprüfe Benutzername, Passwort oder IP-Berechtigungen.",
+                        "Datenbankfehler",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "Fehler beim Verbinden zur Datenbank:\n" + e.getMessage(),
+                        "Datenbankfehler",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return null;
+        }
     }
 
     private static void createTableIfNotExists(Connection conn) {
@@ -43,7 +59,7 @@ public class Database {
         }
     }
 
-    public static void saveUserFileToDatabase(String accountName, File file) {
+    public static void saveUserFileToDatabase(String accountName, File file, MainWindow mainWindow) {
         try (Connection conn = Database.getConnection()) {
             String insertOrUpdate = """
             INSERT INTO user_dateien (accountName, datei)
@@ -59,14 +75,17 @@ public class Database {
                 stmt.executeUpdate();
             }
 
-            System.out.println("Datei erfolgreich gespeichert.");
+            if (mainWindow != null) mainWindow.setStatus("<html><font color='green'>✔️ Datei gespeichert</font></html>");
+            else System.out.println("Datei erfolgreich gespeichert.");
         } catch (Exception e) {
-            e.printStackTrace();
+            if (mainWindow != null) mainWindow.setStatus("<html><font color='red'>❌ Fehler beim Speichern: </font></html>" + e.getMessage());
+            else e.printStackTrace();
         }
     }
 
-    public static void loadUserFileFromDatabase(String accountName, File targetFile) {
+    public static void loadUserFileFromDatabase(String accountName, File targetFile, MainWindow mainWindow) {
         try (Connection conn = Database.getConnection()) {
+            if (conn == null) return;
             String select = "SELECT datei FROM user_dateien WHERE accountName = ?";
 
             try (PreparedStatement stmt = conn.prepareStatement(select)) {
@@ -83,7 +102,8 @@ public class Database {
                                 fos.write(buffer, 0, bytesRead);
                             }
 
-                            System.out.println("Datei erfolgreich geladen.");
+                            if (mainWindow != null) mainWindow.setStatus("<html><font color='green'>✔️ Datei geladen</font></html>");
+                            else System.out.println("Datei erfolgreich geladen.");
                         }
                     } else {
                         System.out.println("Keine Datei für diesen Account gefunden.");
@@ -96,4 +116,15 @@ public class Database {
         }
     }
 
+    public static boolean isServerAvailable(String serverUrl, MainWindow mainWindow) {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(serverUrl, 3306), 2000);
+            return true;
+        } catch (IOException e) {
+            String message = "<html><font color='red'>❌ Server nicht erreichbar</font></html>";
+            if (mainWindow != null) mainWindow.setStatus(message);
+            else System.err.println(message);
+            return false;
+        }
+    }
 }

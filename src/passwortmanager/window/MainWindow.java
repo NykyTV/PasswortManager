@@ -40,6 +40,7 @@ public class MainWindow extends JFrame{
     public JScrollPane scrollBarPane;
     public JButton button_Show;
     private JButton settingsButton;
+    private JLabel statusLabel;
 
     // Local Variables
     public String m_masterpassword;
@@ -343,10 +344,8 @@ public class MainWindow extends JFrame{
         Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
         setModified(false);
     }
+
+    public void setStatus(String status) {
+        SwingUtilities.invokeLater(() -> statusLabel.setText(status));
+    }
 }
-
-
-// -------- CUSTOM CLASS to render Button in JTable ---------
-
-
-

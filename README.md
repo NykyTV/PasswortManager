@@ -17,10 +17,15 @@
 
 ![image](https://github.com/user-attachments/assets/c111eb5e-bc7f-4ee1-b64f-51e9bf583291)
 
+---
+
 ## Install PasswortManager Server (Debian 11)
 
-used in this project:
-[JDBC Driver/Mysql Connector](https://dev.mysql.com/downloads/connector/j/)
+`wget installscript`
+
+<details>
+<summary>Manual Installation</summary>
+
 
 ```bash
 sudo apt update && sudo apt upgrade -y
@@ -34,52 +39,41 @@ create docker-compose.yml and add this content:
 version: '3.8'
 
 services:
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
-    restart: always
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: geheim123
+      MYSQL_ROOT_PASSWORD: deinPasswort
       MYSQL_DATABASE: passwortmanager
     volumes:
-      - mariadb_data:/var/lib/mysql
-    networks:
-      - internal
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
-    restart: always
+    restart: unless-stopped
     ports:
-      - 8080:80
+      - "8080:80"
     environment:
-      PMA_HOST: mariadb
+      PMA_HOST: mysql
+      PMA_PORT: 3306
       PMA_USER: root
-      PMA_PASSWORD: geheim123
-    networks:
-      - internal
+      PMA_PASSWORD: deinPasswort
 
 volumes:
-  mariadb_data:
-
-networks:
-  internal:
+  mysql_data:
 ```
+</details>
 
-start docker container
+**phpMyAdmin is optional!**
+
+used in this project:
+[JDBC Driver/Mysql Connector](https://dev.mysql.com/downloads/connector/j/)
+
+## Start Docker container
 ```bash
 docker compose up -d
 ```
-
-```SQL
-CREATE DATABASE passwortmanager;
-USE passwortmanager;
-
-CREATE TABLE user_dateien (
-    accountName VARCHAR(255) PRIMARY KEY,
-    datei LONGBLOB
-);
-
-```
-
-OPTIONAL: phpMyAdmin

@@ -1,9 +1,9 @@
 package passwortmanager.window;
 
+import lombok.Getter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import passwortmanager.utilities.Darkmode;
-import passwortmanager.utilities.SettingsLoader;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -13,30 +13,28 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.StringReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+@Getter
 public class LoginWindow extends JFrame {
 
-    private Darkmode darkmodeUtility;
-    public JLabel label_title;
-    public JPanel LoginWindow;
-    public JButton loginButton;
-    public JButton registerButton;
-    public JTextField benutzerNameEingabe;
-    public JTextField passwortEingabe;
-    public JLabel benutzerText;
-    public JLabel passwortText;
+    private Darkmode darkmodeUtility = new Darkmode(this);
+    private JLabel label_title;
+    private JPanel LoginWindow = new JPanel();
+    private JButton loginButton;
+    private JButton registerButton;
+    private JTextField benutzerNameEingabe;
+    private JTextField passwortEingabe;
+    private JLabel benutzerText;
+    private JLabel passwortText;
     private static final String CREDENTIALS_FILE = "credentials.json";
     private static final String SETTINGS_FILE = "settings.json";
 
     public LoginWindow(String title) {
         super(title);
-        LoginWindow = new JPanel();
-        darkmodeUtility = new Darkmode(this);
 
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -48,7 +46,7 @@ public class LoginWindow extends JFrame {
 
         addComponents();
         setupActionListeners();
-        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
+        darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
         setVisible(true);
     }
 
@@ -223,27 +221,5 @@ public class LoginWindow extends JFrame {
         for (JLabel jLabel : labelList) {
             jLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         }
-    }
-
-    private String getSettings(String username) throws Exception {
-        JSONObject settings = loadSettings();
-        return (String) settings.get(username);
-    }
-
-    public JSONObject loadSettings() throws Exception {
-        if (Files.exists(Paths.get(SETTINGS_FILE))) {
-            String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
-            JSONParser parser = new JSONParser();
-            return (JSONObject) parser.parse(new StringReader(content));
-        }
-        return new JSONObject();
-    }
-
-    public static String removeFirstXCharacters(String input, int x) {
-        // Sicherstellen, dass x nicht größer ist als die Länge des Strings
-        if (input == null || x >= input.length()) {
-            return ""; // Rückgabe eines leeren Strings, wenn x zu groß ist
-        }
-        return input.substring(x); // Gibt den String ab dem Index x zurück
     }
 }

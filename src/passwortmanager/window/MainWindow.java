@@ -1,5 +1,6 @@
 package passwortmanager.window;
 
+import lombok.Getter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -14,37 +15,37 @@ import javax.swing.table.DefaultTableModel;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Random;
 
+@Getter
 public class MainWindow extends JFrame{
 
     private Darkmode darkmodeUtility;
 
     // MainWindow.form Variables
-    public JPanel MainPanel;
-    public JLabel label_AppName;
-    public JButton button_logout;
-    public JLabel label_EntryName;
-    public JTextField textfield_EntryName;
-    public JLabel label_Username;
-    public JTextField textfield_Username;
-    public JLabel label_Password;
-    public JPasswordField textfield_Password;
-    public JButton button_GeneratePW;
-    public JButton button_ADD;
-    public JTable passwordTable;
-    private static final String SETTINGS_FILE = "settings.json";
-    public JButton button_Save;
-    public JPanel TopPanel;
-    public JPanel MidPanel;
-    public JScrollPane scrollBarPane;
-    public JButton button_Show;
+    private JPanel MainPanel;
+    private JLabel label_AppName;
+    private JButton button_logout;
+    private JLabel label_EntryName;
+    private JTextField textfield_EntryName;
+    private JLabel label_Username;
+    private JTextField textfield_Username;
+    private JLabel label_Password;
+    private JPasswordField textfield_Password;
+    private JButton button_GeneratePW;
+    private JButton button_ADD;
+    private JTable passwordTable;
+    private JButton button_Save;
+    private JPanel TopPanel;
+    private JPanel MidPanel;
+    private JScrollPane scrollBarPane;
+    private JButton button_Show;
     private JButton settingsButton;
     private JLabel statusLabel;
+    private static final String SETTINGS_FILE = "settings.json";
 
     // Local Variables
-    public String m_masterpassword;
-    public String m_accountName;
+    private String m_masterpassword;
+    private String m_accountName;
     private boolean isModified = false; // Speichert, ob Änderungen gemacht wurden
     public static boolean ignoreNextTableChange = false;
 
@@ -67,7 +68,7 @@ public class MainWindow extends JFrame{
         button_ADD.setEnabled(false);
         button_Save.setEnabled(false);
 
-        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
+        darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
         button_Show.setText("\uD83D\uDC41"); // "auge icon" setzen da in from Editor nicht möglich
     }
 
@@ -283,8 +284,8 @@ public class MainWindow extends JFrame{
     }
 
     public void performDarkmode() {
-        darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
-        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
+        darkmodeUtility.setDarkMode(!darkmodeUtility.getDarkMode());
+        darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
     }
 
     private String getSettings(String username) throws Exception {

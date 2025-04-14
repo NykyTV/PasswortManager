@@ -21,7 +21,7 @@
 
 ## Install PasswortManager Server (Debian 11)
 
-`wget installscript`
+`wget -O install.sh https://raw.githubusercontent.com/NykyTV/PasswortManager/refs/heads/develop/server-install/install.sh`
 
 <details>
 <summary>Manual Installation</summary>

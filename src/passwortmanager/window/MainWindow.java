@@ -80,7 +80,12 @@ public class MainWindow extends JFrame{
 
     private void addListeners() {
         button_logout.addActionListener(_ -> logout());
-        button_GeneratePW.addActionListener(_ -> textfield_Password.setText(generatePassword()));
+        button_GeneratePW.addActionListener(_ -> {
+            new GeneratePassword().showPopupWindow(e -> {
+                String pw = e.getSource().toString();
+                textfield_Password.setText(pw);
+            });
+        });
         button_ADD.addActionListener(_ -> addPasswordToTable());
         button_Save.addActionListener(_ -> save());
         button_Show.addActionListener(_ -> togglePasswordVisibility());
@@ -213,24 +218,6 @@ public class MainWindow extends JFrame{
                 loginWindow.setVisible(true);
             });
         }
-    }
-
-    private String generatePassword() {
-        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String lowerCase = "abcdefghijklmnopqrstuvwxyz";
-        String numbers = "0123456789";
-        String specialChars = "!@#$%^&*+-=<>?";
-        String allChars = upperCase + lowerCase + numbers + specialChars;
-
-        StringBuilder password = new StringBuilder();
-        Random random = new Random();
-
-        for (int i = 0; i < 12; i++) {  // Generiert ein 12-stelliges Passwort
-            int index = random.nextInt(allChars.length());
-            password.append(allChars.charAt(index));
-        }
-
-        return password.toString();
     }
 
     private void addPasswordToTable() {

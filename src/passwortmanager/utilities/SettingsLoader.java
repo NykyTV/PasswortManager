@@ -215,7 +215,7 @@ public class SettingsLoader {
             try {
                 parsedArray = (JSONArray) new JSONParser().parse(new StringReader(decryptedJson));
             } catch (Exception ex) {
-                System.err.println("❌ Entschlüsselungsfehler: " + ex.getMessage());
+                System.err.println("Entschlüsselungsfehler: " + ex.getMessage());
                 return false;
             }
 
@@ -238,7 +238,7 @@ public class SettingsLoader {
                 writer.write(newEncryptedObject.toString());
                 writer.flush();  // Ensure all data is written
             } catch (Exception e) {
-                System.err.println("❌ Fehler beim Speichern der Datei: " + e.getMessage());
+                System.err.println("Fehler beim Speichern der Datei: " + e.getMessage());
                 e.printStackTrace();
                 return false;
             }
@@ -251,7 +251,7 @@ public class SettingsLoader {
             return true;
 
         } catch (Exception e) {
-            System.err.println("🔥 Kritischer Fehler: " + e.getClass().getSimpleName());
+            System.err.println("Fehler: " + e.getClass().getSimpleName());
             e.printStackTrace();
             return false;
         }

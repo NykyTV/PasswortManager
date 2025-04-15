@@ -190,7 +190,7 @@ public class Storage {
         return null;
     }
 
-    private static String extractHostFromUrl(String url) {
+    public static String extractHostFromUrl(String url) {
         // z.B. jdbc:mysql://localhost:3306/dbname
         try {
             return url.split("//")[1].split(":")[0]; // "localhost"

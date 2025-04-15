@@ -92,7 +92,7 @@ public class MainWindow extends JFrame{
         settingsButton.addActionListener(_ -> {
             try {
                 String settings = getSettings(m_accountName);
-                SettingsLoader.showSettingsDialog(this);
+                SettingsLoader.showSettingsDialog(this, m_accountName);
             } catch (Exception e) {
                 e.printStackTrace();
             }

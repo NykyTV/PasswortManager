@@ -138,7 +138,7 @@ public class MainWindow extends JFrame{
                 int column = e.getColumn();
                 if (column == 0) { // Name column
                     String newName = (String) passwordTable.getValueAt(row, column);
-                    String uniqueName = getUniqueName(newName);
+                    String uniqueName = getUniqueName(newName, row);
                     if (!newName.equals(uniqueName)) {
                         TableModelListener listener = this;
                         passwordTable.getModel().removeTableModelListener(listener);
@@ -226,7 +226,7 @@ public class MainWindow extends JFrame{
         String password = textfield_Password.getText();
 
         if (!name.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
-            name = getUniqueName(name);
+            name = getUniqueName(name, -1);
 
             String maskedPassword = "*".repeat(password.length());
             Object[] rowData = {name, username, maskedPassword, "DEL"};
@@ -246,12 +246,12 @@ public class MainWindow extends JFrame{
         }
     }
 
-    private String getUniqueName(String name) {
+    private String getUniqueName(String name, int ignoreRow) {
         DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
         String uniqueName = name;
         int counter = 1;
 
-        while (isNameDuplicate(uniqueName)) {
+        while (isNameDuplicate(uniqueName, ignoreRow)) {
             uniqueName = name + " (" + counter + ")";
             counter++;
         }
@@ -259,16 +259,15 @@ public class MainWindow extends JFrame{
         return uniqueName;
     }
 
-    private boolean isNameDuplicate(String name) {
+    private boolean isNameDuplicate(String name, int ignoreRow) {
         DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
         for (int i = 0; i < model.getRowCount(); i++) {
-            if (name.equals(model.getValueAt(i, 0))) {
+            if (i != ignoreRow && name.equals(model.getValueAt(i, 0))) {
                 return true;
             }
         }
         return false;
     }
-
 
     private void setupButtonColumn(JTable table) {
         table.getColumnModel().getColumn(3).setCellRenderer(new TogglePasswordRenderer());

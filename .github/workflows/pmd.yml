@@ -35,7 +35,7 @@ jobs:
         uses: pmd/pmd-github-action@v2.0.0
         with:
           rulesets: 'rulesets/java/quickstart.xml'
-          sourcePath: 'src/main/java'
+          sourcePath: 'src/passwortmanager'
           analyzeModifiedFilesOnly: false
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3

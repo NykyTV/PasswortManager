@@ -1,1 +1,1 @@
-{"serverMode":"true","password":"deinPasswort","darkMode":false,"user":"root","url":"jdbc:mysql:\/\/192.168.2.22:3306\/passwortmanager "}
+{"serverMode":"false","password":"deinPasswort","darkMode":false,"user":"root","url":"jdbc:mysql:\/\/192.168.2.22:3306\/passwortmanager "}

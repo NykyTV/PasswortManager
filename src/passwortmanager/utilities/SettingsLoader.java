@@ -75,14 +75,14 @@ public class SettingsLoader {
                 writer.write(settings.toString());
                 JOptionPane.showMessageDialog(parent, "Einstellungen gespeichert.");
 
-                if (parent instanceof MainWindow) {
-                    ((MainWindow) parent).performDarkmode();
-                }
-
                 dialog.dispose();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(parent, "Fehler beim Speichern!", "Fehler", JOptionPane.ERROR_MESSAGE);
+            }
+
+            if (parent instanceof MainWindow) {
+                ((MainWindow) parent).performDarkmode();
             }
         });
 

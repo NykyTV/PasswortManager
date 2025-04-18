@@ -282,7 +282,7 @@ public class MainWindow extends JFrame{
     }
 
     public void performDarkmode() {
-        darkmodeUtility.darkMode = !darkmodeUtility.darkMode;
+        darkmodeUtility.getDarkmode();
         darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
     }
 

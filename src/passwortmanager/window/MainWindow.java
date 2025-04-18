@@ -49,7 +49,7 @@ public class MainWindow extends JFrame{
     public static boolean ignoreNextTableChange = false;
 
     public MainWindow(String title, String masterPassword, String accountName) {
-        super(title);
+        super(title + " | " + accountName);
         setContentPane(MainPanel);
         MainPanel.setOpaque(true);
         darkmodeUtility = new Darkmode(this);

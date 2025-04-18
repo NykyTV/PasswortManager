@@ -1,23 +1,27 @@
 package passwortmanager.window;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import passwortmanager.utilities.AES;
 import passwortmanager.utilities.Darkmode;
+import passwortmanager.utilities.Database;
 import passwortmanager.utilities.SettingsLoader;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Base64;
 import java.util.List;
+
+import static passwortmanager.utilities.Storage.extractHostFromUrl;
 
 public class LoginWindow extends JFrame {
 
@@ -30,8 +34,6 @@ public class LoginWindow extends JFrame {
     public JTextField passwortEingabe;
     public JLabel benutzerText;
     public JLabel passwortText;
-    private static final String CREDENTIALS_FILE = "credentials.json";
-    private static final String SETTINGS_FILE = "settings.json";
 
     public LoginWindow(String title) {
         super(title);
@@ -134,6 +136,7 @@ public class LoginWindow extends JFrame {
     private void performRegistration() {
         String username = benutzerNameEingabe.getText();
         String password = passwortEingabe.getText();
+
         File file = new File(username + ".json");
 
         if (username.isEmpty() || password.isEmpty()) {
@@ -144,66 +147,71 @@ public class LoginWindow extends JFrame {
         if (file.exists()) {
             JOptionPane.showMessageDialog(this, "Benutzername bereits vergeben", "Fehler", JOptionPane.ERROR_MESSAGE);
             return;
-        } else {
-            try {
-                file.createNewFile();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
-        if (saveCredentials(username, password)) {
+        try {
+            // lege leere Passwortliste an
+            JSONArray leereListe = new JSONArray();
+            String jsonString = leereListe.toString();
+
+            byte[] salt = AES.generateSalt();
+            IvParameterSpec iv = AES.generateIv();
+            SecretKey secretKey = AES.deriveKeyFromPassword(password, salt);
+            String encryptedJson = AES.encrypt(jsonString, secretKey, iv);
+
+            JSONObject encryptedObject = new JSONObject();
+            encryptedObject.put("iv", Base64.getEncoder().encodeToString(iv.getIV()));
+            encryptedObject.put("salt", Base64.getEncoder().encodeToString(salt));
+            encryptedObject.put("data", encryptedJson);
+
+            FileWriter writer = new FileWriter(file);
+            writer.write(encryptedObject.toString());
+            writer.close();
+
             JOptionPane.showMessageDialog(this, "Registrierung erfolgreich", "Erfolg", JOptionPane.INFORMATION_MESSAGE);
-        } else {
+        } catch (Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Registrierung fehlgeschlagen", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private boolean saveCredentials(String username, String password) {
+    private boolean checkLogin(String username, String password) {
+        File file = new File(username + ".json");
+
+        // Server-Modus prüfen
+        if (SettingsLoader.isServerMode()) {
+            JSONObject settings = SettingsLoader.loadSettings();
+            String serverUrl = extractHostFromUrl((String) settings.get("url"));
+
+            if (Database.isServerAvailable(serverUrl, null)) {
+                // Versuche Datei vom Server zu holen
+                Database.loadUserFileFromDatabase(username, file, null);
+            } else {
+                JOptionPane.showMessageDialog(this, "Server nicht erreichbar. Anmeldung im Offline-Modus.", "Offline-Modus", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+
+        if (!file.exists()) return false;
+
         try {
-            String hashedPassword = hashPassword(password);
-            JSONObject credentials = loadCredentials();
-            credentials.put(username, hashedPassword);
-            Files.write(Paths.get(CREDENTIALS_FILE), credentials.toString().getBytes());
+            JSONParser parser = new JSONParser();
+            JSONObject encryptedObject = (JSONObject) parser.parse(new FileReader(file));
+
+            String ivString = (String) encryptedObject.get("iv");
+            String saltString = (String) encryptedObject.get("salt");
+            String encryptedJson = (String) encryptedObject.get("data");
+
+            byte[] ivBytes = Base64.getDecoder().decode(ivString);
+            byte[] saltBytes = Base64.getDecoder().decode(saltString);
+
+            IvParameterSpec iv = new IvParameterSpec(ivBytes);
+            SecretKey secretKey = AES.deriveKeyFromPassword(password, saltBytes);
+
+            // versuche die Entschlüsselung – wenn es fehlschlägt → falsches Passwort
+            AES.decrypt(encryptedJson, secretKey, iv);
+
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private String getStoredHash(String username) throws Exception {
-        JSONObject credentials = loadCredentials();
-        return (String) credentials.get(username);
-    }
-
-    private JSONObject loadCredentials() throws Exception {
-        if (Files.exists(Paths.get(CREDENTIALS_FILE))) {
-            String content = new String(Files.readAllBytes(Paths.get(CREDENTIALS_FILE)));
-            JSONParser parser = new JSONParser();
-            return (JSONObject) parser.parse(new StringReader(content));
-        }
-        return new JSONObject();
-    }
-
-    private String hashPassword(String password) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] hashedBytes = md.digest(password.getBytes());
-        StringBuilder sb = new StringBuilder();
-        for (byte b : hashedBytes) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
-    }
-
-    private boolean checkLogin(String username, String password) {
-        try {
-            String storedHash = getStoredHash(username);
-            if (storedHash == null) return false;
-            String inputHash = hashPassword(password);
-            return storedHash.equals(inputHash);
-        } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -223,27 +231,5 @@ public class LoginWindow extends JFrame {
         for (JLabel jLabel : labelList) {
             jLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         }
-    }
-
-    private String getSettings(String username) throws Exception {
-        JSONObject settings = loadSettings();
-        return (String) settings.get(username);
-    }
-
-    public JSONObject loadSettings() throws Exception {
-        if (Files.exists(Paths.get(SETTINGS_FILE))) {
-            String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
-            JSONParser parser = new JSONParser();
-            return (JSONObject) parser.parse(new StringReader(content));
-        }
-        return new JSONObject();
-    }
-
-    public static String removeFirstXCharacters(String input, int x) {
-        // Sicherstellen, dass x nicht größer ist als die Länge des Strings
-        if (input == null || x >= input.length()) {
-            return ""; // Rückgabe eines leeren Strings, wenn x zu groß ist
-        }
-        return input.substring(x); // Gibt den String ab dem Index x zurück
     }
 }

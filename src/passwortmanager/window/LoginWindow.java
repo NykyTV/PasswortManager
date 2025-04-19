@@ -107,8 +107,8 @@ public class LoginWindow extends JFrame {
     }
 
     //Diese Funktion erstellt einen Abstand mit der übergebenen Höhe. Wird in "arrangeComponents()" verwendet.
-    private Component Abstand(int höhe) {
-        return Box.createVerticalStrut(höhe);
+    private Component Abstand(int hoehe) {
+        return Box.createVerticalStrut(hoehe);
     }
 
     //Diese Funktion ordnet die Komponenten richtig an.

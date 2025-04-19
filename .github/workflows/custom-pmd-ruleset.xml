@@ -6,43 +6,13 @@
                              https://pmd.github.io/ruleset_2_0_0.xsd">
 
     <description>
-        PMD Quickstart ruleset ohne die "Braces"-Regel (This statement should have braces).
+        PMD 7 Quickstart ruleset ohne die Regel "Braces".
     </description>
 
-    <!-- Design -->
-    <rule ref="category/java/design.xml/SimplifyBooleanExpressions"/>
-    <rule ref="category/java/design.xml/SimplifyConditional"/>
-    <rule ref="category/java/design.xml/UseCollectionIsEmpty"/>
+    <!-- Quickstart-Regeln laden -->
+    <rule ref="category/java/quickstart.xml">
+        <!-- Diese Regel explizit ausschließen -->
+        <exclude name="Braces"/>
+    </rule>
 
-    <!-- Error Prone -->
-    <rule ref="category/java/errorprone.xml/MethodArgumentCouldBeFinal"/>
-    <rule ref="category/java/errorprone.xml/AvoidAssertAsIdentifier"/>
-    <rule ref="category/java/errorprone.xml/ComparisonWithNaN"/>
-    <rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock"/>
-
-    <!-- Best Practices -->
-    <rule ref="category/java/bestpractices.xml/AvoidPrintStackTrace"/>
-    <rule ref="category/java/bestpractices.xml/AvoidThrowingNullPointerException"/>
-    <rule ref="category/java/bestpractices.xml/MethodReturnsInternalArray"/>
-    <rule ref="category/java/bestpractices.xml/ClassWithOnlyPrivateConstructorsShouldBeFinal"/>
-    <!-- Braces ist hier normalerweise drin, wurde aber absichtlich weggelassen -->
-
-    <!-- Code Style -->
-    <rule ref="category/java/codestyle.xml/UnnecessaryImport"/>
-    <rule ref="category/java/codestyle.xml/UnnecessaryConstructor"/>
-    <rule ref="category/java/codestyle.xml/AtLeastOneConstructor"/>
-    <rule ref="category/java/codestyle.xml/UseUnderscoresInNumericLiterals"/>
-
-    <!-- Documentation -->
-    <rule ref="category/java/documentation.xml/CommentRequired"/>
-
-    <!-- Multithreading -->
-    <rule ref="category/java/multithreading.xml/AvoidUsingVolatile"/>
-
-    <!-- Performance -->
-    <rule ref="category/java/performance.xml/AvoidInstantiatingObjectsInLoops"/>
-
-    <!-- Security -->
-    <rule ref="category/java/security.xml/InsecureCryptoIv"/>
-    <rule ref="category/java/security.xml/InsecureCryptoMode"/>
 </ruleset>

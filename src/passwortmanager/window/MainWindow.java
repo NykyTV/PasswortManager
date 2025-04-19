@@ -14,7 +14,6 @@ import javax.swing.table.DefaultTableModel;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Random;
 
 public class MainWindow extends JFrame{
 
@@ -55,13 +54,13 @@ public class MainWindow extends JFrame{
         darkmodeUtility = new Darkmode(this);
         createTable();
         addListeners();
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setSize(600, 800);
         setLocationRelativeTo(null);
         m_masterpassword = masterPassword;
         m_accountName = accountName;
 
-        Storage.loadPasswords(MainWindow.this, masterPassword, accountName);
+        Storage.loadPasswords(this, masterPassword, accountName);
         setVisible(true);
 
         button_ADD.setEnabled(false);
@@ -91,7 +90,6 @@ public class MainWindow extends JFrame{
         button_Show.addActionListener(_ -> togglePasswordVisibility());
         settingsButton.addActionListener(_ -> {
             try {
-                String settings = getSettings(m_accountName);
                 SettingsLoader.showSettingsDialog(this, m_accountName);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -130,7 +128,7 @@ public class MainWindow extends JFrame{
             @Override
             public void tableChanged(TableModelEvent e) {
                 if (MainWindow.ignoreNextTableChange) {
-                    MainWindow.ignoreNextTableChange = false; // Zurücksetzen
+                    ignoreNextTableChange = false; // Zurücksetzen
                     return;
                 }
 
@@ -200,14 +198,14 @@ public class MainWindow extends JFrame{
         if (option == JOptionPane.YES_OPTION) {
             if (isModified) {
                 int changes = JOptionPane.showConfirmDialog(
-                        MainWindow.this,
+                        this,
                         "Es gibt ungespeicherte Änderungen. Möchten Sie diese speichern?",
                         "Änderungen speichern?",
                         JOptionPane.YES_NO_OPTION
                 );
 
                 if (changes == JOptionPane.YES_OPTION) {
-                    Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
+                    Storage.savePasswords(this, m_masterpassword, m_accountName, null, null);
                 }
             }
 
@@ -247,7 +245,6 @@ public class MainWindow extends JFrame{
     }
 
     private String getUniqueName(String name, int ignoreRow) {
-        DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
         String uniqueName = name;
         int counter = 1;
 
@@ -327,7 +324,7 @@ public class MainWindow extends JFrame{
     }
 
     public void save() {
-        Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
+        Storage.savePasswords(this, m_masterpassword, m_accountName, null, null);
         setModified(false);
     }
 

@@ -1,20 +1,15 @@
 <?xml version="1.0"?>
 <ruleset name="Custom PMD Ruleset"
-         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns="https://pmd.github.io/ruleset/2.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 
-                             http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+         xsi:schemaLocation="https://pmd.github.io/ruleset/2.0.0
+                             https://pmd.github.io/ruleset_2_0_0.xsd">
 
     <description>
-        Alle Standardregeln, außer: "This statement should have braces".
+        Quickstart-Regeln, aber ohne Braces-Warnung.
     </description>
 
-    <!-- Quickstart-Regeln, aber ohne Braces-Zwang -->
-    <rule ref="rulesets/java/quickstart.xml">
-        <exclude name="IfStmtsMustUseBraces"/>
+    <rule ref="category/java/quickstart.xml">
+        <exclude name="Braces"/>
     </rule>
-
-    <!-- Weitere Regelsets? Kein Problem -->
-    <rule ref="rulesets/java/unusedcode.xml"/>
-    <rule ref="rulesets/java/design.xml"/>
 </ruleset>

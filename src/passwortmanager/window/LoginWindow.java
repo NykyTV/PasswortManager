@@ -155,12 +155,12 @@ public class LoginWindow extends JFrame {
             String jsonString = leereListe.toString();
 
             byte[] salt = AES.generateSalt();
-            IvParameterSpec iv = AES.generateIv();
+            byte[] iv = AES.generateIv();
             SecretKey secretKey = AES.deriveKeyFromPassword(password, salt);
             String encryptedJson = AES.encrypt(jsonString, secretKey, iv);
 
             JSONObject encryptedObject = new JSONObject();
-            encryptedObject.put("iv", Base64.getEncoder().encodeToString(iv.getIV()));
+            encryptedObject.put("iv", Base64.getEncoder().encodeToString(iv));
             encryptedObject.put("salt", Base64.getEncoder().encodeToString(salt));
             encryptedObject.put("data", encryptedJson);
 
@@ -204,11 +204,10 @@ public class LoginWindow extends JFrame {
             byte[] ivBytes = Base64.getDecoder().decode(ivString);
             byte[] saltBytes = Base64.getDecoder().decode(saltString);
 
-            IvParameterSpec iv = new IvParameterSpec(ivBytes);
             SecretKey secretKey = AES.deriveKeyFromPassword(password, saltBytes);
 
             // versuche die Entschlüsselung – wenn es fehlschlägt → falsches Passwort
-            AES.decrypt(encryptedJson, secretKey, iv);
+            AES.decrypt(encryptedJson, secretKey, ivBytes);
 
             return true;
         } catch (Exception e) {

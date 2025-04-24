@@ -201,14 +201,13 @@ public class SettingsLoader {
             // IV und Salt aus bestehender Datei
             byte[] ivBytes = Base64.getDecoder().decode((String) encryptedObject.get("iv"));
             byte[] saltBytes = Base64.getDecoder().decode((String) encryptedObject.get("salt"));
-            IvParameterSpec iv = new IvParameterSpec(ivBytes);
 
             // Alten Schlüssel ableiten
             SecretKey oldKey = AES.deriveKeyFromPassword(oldPassword, saltBytes);
 
             // Entschlüsselung
             String cipherText = (String) encryptedObject.get("data");
-            String decryptedJson = AES.decrypt(cipherText, oldKey, iv);
+            String decryptedJson = AES.decrypt(cipherText, oldKey, ivBytes);
 
             // Korrigiertes Parsing des JSON-Arrays
             JSONArray parsedArray;
@@ -221,7 +220,7 @@ public class SettingsLoader {
 
             // Neue Verschlüsselungsparameter
             byte[] newSalt = AES.generateSalt();
-            IvParameterSpec newIv = AES.generateIv();
+            byte[] newIv = AES.generateIv();
             SecretKey newKey = AES.deriveKeyFromPassword(newPassword, newSalt);
 
             // Neu verschlüsseln
@@ -229,7 +228,7 @@ public class SettingsLoader {
 
             // Aktualisierte Daten speichern
             JSONObject newEncryptedObject = new JSONObject();
-            newEncryptedObject.put("iv", Base64.getEncoder().encodeToString(newIv.getIV()));
+            newEncryptedObject.put("iv", Base64.getEncoder().encodeToString(newIv));
             newEncryptedObject.put("salt", Base64.getEncoder().encodeToString(newSalt));
             newEncryptedObject.put("data", newEncryptedJson);
 

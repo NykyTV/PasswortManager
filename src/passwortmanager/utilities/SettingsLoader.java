@@ -191,65 +191,24 @@ public class SettingsLoader {
 
     // Geänderte changeMasterPassword-Methode
     public boolean changeMasterPassword(String username, String oldPassword, String newPassword) {
-        File file = new File(username + ".json");
+        String filename = Common.getPasswordFilename(username);
+
+        File file = new File(filename);
         if (!file.exists()) return false;
 
         try {
-            JSONParser parser = new JSONParser();
-            JSONObject encryptedObject = (JSONObject) parser.parse(new FileReader(file));
+            JSONArray passwords = passwortmanager.utilities.FileReader.loadFile(filename, oldPassword);
 
-            // IV und Salt aus bestehender Datei
-            byte[] ivBytes = Base64.getDecoder().decode((String) encryptedObject.get("iv"));
-            byte[] saltBytes = Base64.getDecoder().decode((String) encryptedObject.get("salt"));
-
-            // Alten Schlüssel ableiten
-            SecretKey oldKey = AES.deriveKeyFromPassword(oldPassword, saltBytes);
-
-            // Entschlüsselung
-            String cipherText = (String) encryptedObject.get("data");
-            String decryptedJson = AES.decrypt(cipherText, oldKey, ivBytes);
-
-            // Korrigiertes Parsing des JSON-Arrays
-            JSONArray parsedArray;
-            try {
-                parsedArray = (JSONArray) new JSONParser().parse(new StringReader(decryptedJson));
-            } catch (Exception ex) {
-                System.err.println("Entschlüsselungsfehler: " + ex.getMessage());
-                return false;
-            }
-
-            // Neue Verschlüsselungsparameter
-            byte[] newSalt = AES.generateSalt();
-            byte[] newIv = AES.generateIv();
-            SecretKey newKey = AES.deriveKeyFromPassword(newPassword, newSalt);
-
-            // Neu verschlüsseln
-            String newEncryptedJson = AES.encrypt(parsedArray.toString(), newKey, newIv);
-
-            // Aktualisierte Daten speichern
-            JSONObject newEncryptedObject = new JSONObject();
-            newEncryptedObject.put("iv", Base64.getEncoder().encodeToString(newIv));
-            newEncryptedObject.put("salt", Base64.getEncoder().encodeToString(newSalt));
-            newEncryptedObject.put("data", newEncryptedJson);
-
-            // Speichern des neuen verschlüsselten Objekts in die Datei
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write(newEncryptedObject.toString());
-                writer.flush();  // Ensure all data is written
-            } catch (Exception e) {
-                System.err.println("Fehler beim Speichern der Datei: " + e.getMessage());
-                e.printStackTrace();
-                return false;
-            }
+            passwortmanager.utilities.FileReader.saveFile(passwords, filename, newPassword);
 
             if (isServerMode()) {
-                File encryptedFile = new File(username + ".json");
-                Database.saveUserFileToDatabase(username, encryptedFile, null);
+                Database.saveUserFileToDatabase(username, file, null);
             }
 
             return true;
 
         } catch (Exception e) {
+            System.err.println("Fehler: " + e.getMessage());
             System.err.println("Fehler: " + e.getClass().getSimpleName());
             e.printStackTrace();
             return false;

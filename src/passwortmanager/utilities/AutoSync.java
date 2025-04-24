@@ -13,6 +13,8 @@ public class AutoSync {
     private static Timer timer = null;
 
     public static void scheduleSync(String accountName, MainWindow mainWindow) {
+        String filename = Common.getPasswordFilename(accountName);
+
         if (timer != null) return;
 
         timer = new Timer(true);
@@ -23,7 +25,7 @@ public class AutoSync {
                 String serverUrl = extractHostFromUrl((String) settings.get("url"));
 
                 if (Database.isServerAvailable(serverUrl, mainWindow)) {
-                    File file = new File(accountName + ".json");
+                    File file = new File(filename);
                     if (file.exists()) {
                         if (mainWindow != null) mainWindow.setStatus("<html><font color='blue'>🔄 Server wieder online. Synchronisiere...</font></html>");
                         Database.saveUserFileToDatabase(accountName, file, mainWindow);

@@ -3,10 +3,8 @@ package passwortmanager.window;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import passwortmanager.utilities.AES;
-import passwortmanager.utilities.Darkmode;
-import passwortmanager.utilities.Database;
-import passwortmanager.utilities.SettingsLoader;
+import passwortmanager.utilities.*;
+import passwortmanager.utilities.FileReader;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -15,9 +13,9 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -137,7 +135,9 @@ public class LoginWindow extends JFrame {
         String username = benutzerNameEingabe.getText();
         String password = passwortEingabe.getText();
 
-        File file = new File(username + ".json");
+        String filename = Common.getPasswordFilename(username);
+
+        File file = new File(filename);
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Benutzername und Passwort dürfen nicht leer sein", "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -152,31 +152,20 @@ public class LoginWindow extends JFrame {
         try {
             // lege leere Passwortliste an
             JSONArray leereListe = new JSONArray();
-            String jsonString = leereListe.toString();
 
-            byte[] salt = AES.generateSalt();
-            byte[] iv = AES.generateIv();
-            SecretKey secretKey = AES.deriveKeyFromPassword(password, salt);
-            String encryptedJson = AES.encrypt(jsonString, secretKey, iv);
-
-            JSONObject encryptedObject = new JSONObject();
-            encryptedObject.put("iv", Base64.getEncoder().encodeToString(iv));
-            encryptedObject.put("salt", Base64.getEncoder().encodeToString(salt));
-            encryptedObject.put("data", encryptedJson);
-
-            FileWriter writer = new FileWriter(file);
-            writer.write(encryptedObject.toString());
-            writer.close();
+            FileReader.saveFile(leereListe, filename, password);
 
             JOptionPane.showMessageDialog(this, "Registrierung erfolgreich", "Erfolg", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Fehler: " + e.getMessage());
             JOptionPane.showMessageDialog(this, "Registrierung fehlgeschlagen", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private boolean checkLogin(String username, String password) {
-        File file = new File(username + ".json");
+        String filename = Common.getPasswordFilename(username);
+        File file = new File(filename);
 
         // Server-Modus prüfen
         if (SettingsLoader.isServerMode()) {
@@ -194,20 +183,8 @@ public class LoginWindow extends JFrame {
         if (!file.exists()) return false;
 
         try {
-            JSONParser parser = new JSONParser();
-            JSONObject encryptedObject = (JSONObject) parser.parse(new FileReader(file));
-
-            String ivString = (String) encryptedObject.get("iv");
-            String saltString = (String) encryptedObject.get("salt");
-            String encryptedJson = (String) encryptedObject.get("data");
-
-            byte[] ivBytes = Base64.getDecoder().decode(ivString);
-            byte[] saltBytes = Base64.getDecoder().decode(saltString);
-
-            SecretKey secretKey = AES.deriveKeyFromPassword(password, saltBytes);
-
             // versuche die Entschlüsselung – wenn es fehlschlägt → falsches Passwort
-            AES.decrypt(encryptedJson, secretKey, ivBytes);
+            FileReader.loadFile(filename, password);
 
             return true;
         } catch (Exception e) {

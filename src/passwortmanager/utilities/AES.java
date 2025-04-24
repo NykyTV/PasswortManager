@@ -17,20 +17,20 @@ public class AES {
     private static final int ITERATION_COUNT = 65536;
     private static final int GCM_TAG_LENGTH = 16;
 
-    public static String encrypt(String plainText, SecretKey secretKey, byte[] iv) throws Exception {
+    public static byte[] encrypt(String plainText, SecretKey secretKey, byte[] iv) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec);
         byte[] encrypted = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
-        return Base64.getEncoder().encodeToString(encrypted);
+        return encrypted;//Base64.getEncoder().encodeToString(encrypted);
     }
 
     // Methode zur AES-Entschlüsselung
-    public static String decrypt(String cipherText, SecretKey secretKey, byte[] iv) throws Exception {
+    public static String decrypt(byte[] cipherText, SecretKey secretKey, byte[] iv) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec);
-        byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+        byte[] decrypted = cipher.doFinal(cipherText);//Base64.getDecoder().decode(cipherText));
         return new String(decrypted, StandardCharsets.UTF_8);
     }
 

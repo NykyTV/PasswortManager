@@ -41,7 +41,7 @@ public class LoginWindow extends JFrame {
         darkmodeUtility = new Darkmode(this);
 
         this.setMinimumSize(new Dimension(330, 400));
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setContentPane(LoginWindow);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
@@ -79,7 +79,7 @@ public class LoginWindow extends JFrame {
         loginButton.setBackground(Color.WHITE);
         registerButton.setBackground(Color.WHITE);
 
-        List<JButton> buttonList = java.util.List.of(registerButton, loginButton);
+        List<JButton> buttonList = List.of(registerButton, loginButton);
         setButtonElementLocation(buttonList);
 
         //JLabels
@@ -90,7 +90,7 @@ public class LoginWindow extends JFrame {
         label_title.setForeground(new Color(0, 102, 204));
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
-        List<JLabel> labelList = java.util.List.of(label_title, benutzerText, passwortText);
+        List<JLabel> labelList = List.of(label_title, benutzerText, passwortText);
         setLabelElementLocation(labelList);
 
         //JTextField
@@ -100,15 +100,15 @@ public class LoginWindow extends JFrame {
         passwortEingabe = new JPasswordField(20);
         passwortEingabe.setMaximumSize(textFeldGroesse);
 
-        List<JTextField> textFieldList = java.util.List.of(benutzerNameEingabe, passwortEingabe);
+        List<JTextField> textFieldList = List.of(benutzerNameEingabe, passwortEingabe);
         setTextFieldElementLocation(textFieldList);
 
         arrangeComponents();
     }
 
     //Diese Funktion erstellt einen Abstand mit der übergebenen Höhe. Wird in "arrangeComponents()" verwendet.
-    private Component Abstand(int höhe) {
-        return Box.createVerticalStrut(höhe);
+    private Component Abstand(int hoehe) {
+        return Box.createVerticalStrut(hoehe);
     }
 
     //Diese Funktion ordnet die Komponenten richtig an.
@@ -217,18 +217,18 @@ public class LoginWindow extends JFrame {
 
     private void setButtonElementLocation(List<JButton> buttonList) {
         for (JButton jButton : buttonList) {
-            jButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            jButton.setAlignmentX(CENTER_ALIGNMENT);
         }
     }
     private void setTextFieldElementLocation(List<JTextField> textFieldList) {
         for (JTextField jTextField : textFieldList) {
-            jTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
+            jTextField.setAlignmentX(CENTER_ALIGNMENT);
         }
     }
 
     private void setLabelElementLocation(List<JLabel> labelList) {
         for (JLabel jLabel : labelList) {
-            jLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            jLabel.setAlignmentX(CENTER_ALIGNMENT);
         }
     }
 }

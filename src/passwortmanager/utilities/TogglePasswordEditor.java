@@ -112,7 +112,6 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         String name = (String) model.getValueAt(row, 0);
         String username = (String) model.getValueAt(row, 1);
-        String currentValue = (String) model.getValueAt(row, 2);
         String realPassword = loadPasswordForEntry(name, username, mainWindow.m_masterpassword, mainWindow.m_accountName);
 
         if (realPassword != null) {

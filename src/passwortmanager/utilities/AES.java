@@ -3,30 +3,32 @@ package passwortmanager.utilities;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
-import java.util.Base64;
 
 public class AES {
     private static final int KEY_LENGTH = 256;
     private static final int ITERATION_COUNT = 65536;
+    private static final int GCM_TAG_LENGTH = 16;
 
-    public static String encrypt(String plainText, SecretKey secretKey, IvParameterSpec iv) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
+    public static byte[] encrypt(String plainText, SecretKey secretKey, byte[] iv) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec);
         byte[] encrypted = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
-        return Base64.getEncoder().encodeToString(encrypted);
+        return encrypted;//Base64.getEncoder().encodeToString(encrypted);
     }
 
     // Methode zur AES-Entschlüsselung
-    public static String decrypt(String cipherText, SecretKey secretKey, IvParameterSpec iv) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
-        byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+    public static String decrypt(byte[] cipherText, SecretKey secretKey, byte[] iv) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec);
+        byte[] decrypted = cipher.doFinal(cipherText);//Base64.getDecoder().decode(cipherText));
         return new String(decrypted, StandardCharsets.UTF_8);
     }
 
@@ -45,9 +47,9 @@ public class AES {
     }
 
     // Methode zur Generierung eines Initialisierungsvektors (IV)
-    public static IvParameterSpec generateIv() {
+    public static byte[] generateIv() {
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
-        return new IvParameterSpec(iv);
+        return iv;
     }
 }

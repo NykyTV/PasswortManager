@@ -50,19 +50,19 @@ public class MainWindow extends JFrame{
     public static boolean ignoreNextTableChange = false;
 
     public MainWindow(String title, String masterPassword, String accountName) {
-        super(title);
+        super(title + " | " + accountName);
         setContentPane(MainPanel);
         MainPanel.setOpaque(true);
         darkmodeUtility = new Darkmode(this);
         createTable();
         addListeners();
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setSize(600, 800);
         setLocationRelativeTo(null);
         m_masterpassword = masterPassword;
         m_accountName = accountName;
 
-        Storage.loadPasswords(MainWindow.this, masterPassword, accountName);
+        Storage.loadPasswords(this, masterPassword, accountName);
         setVisible(true);
 
         button_ADD.setEnabled(false);
@@ -75,7 +75,7 @@ public class MainWindow extends JFrame{
     public static void main(String[] args)
     {
         SwingUtilities.invokeLater(() -> {
-            LoginWindow loginWindow = new LoginWindow("Login");
+            new LoginWindow("Login");
         });
     }
 
@@ -92,8 +92,7 @@ public class MainWindow extends JFrame{
         button_Show.addActionListener(_ -> togglePasswordVisibility());
         settingsButton.addActionListener(_ -> {
             try {
-                String settings = getSettings(m_accountName);
-                SettingsLoader.showSettingsDialog(this);
+                SettingsLoader.showSettingsDialog(this, m_accountName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -131,7 +130,7 @@ public class MainWindow extends JFrame{
             @Override
             public void tableChanged(TableModelEvent e) {
                 if (MainWindow.ignoreNextTableChange) {
-                    MainWindow.ignoreNextTableChange = false; // Zurücksetzen
+                    ignoreNextTableChange = false; // Zurücksetzen
                     return;
                 }
 
@@ -139,7 +138,7 @@ public class MainWindow extends JFrame{
                 int column = e.getColumn();
                 if (column == 0) { // Name column
                     String newName = (String) passwordTable.getValueAt(row, column);
-                    String uniqueName = getUniqueName(newName);
+                    String uniqueName = getUniqueName(newName, row);
                     if (!newName.equals(uniqueName)) {
                         TableModelListener listener = this;
                         passwordTable.getModel().removeTableModelListener(listener);
@@ -201,14 +200,14 @@ public class MainWindow extends JFrame{
         if (option == JOptionPane.YES_OPTION) {
             if (isModified) {
                 int changes = JOptionPane.showConfirmDialog(
-                        MainWindow.this,
+                        this,
                         "Es gibt ungespeicherte Änderungen. Möchten Sie diese speichern?",
                         "Änderungen speichern?",
                         JOptionPane.YES_NO_OPTION
                 );
 
                 if (changes == JOptionPane.YES_OPTION) {
-                    Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
+                    Storage.savePasswords(this, m_masterpassword, m_accountName, null, null);
                 }
             }
 
@@ -227,7 +226,7 @@ public class MainWindow extends JFrame{
         String password = textfield_Password.getText();
 
         if (!name.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
-            name = getUniqueName(name);
+            name = getUniqueName(name, -1);
 
             String maskedPassword = "*".repeat(password.length());
             Object[] rowData = {name, username, maskedPassword, "DEL"};
@@ -247,12 +246,11 @@ public class MainWindow extends JFrame{
         }
     }
 
-    private String getUniqueName(String name) {
-        DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
+    private String getUniqueName(String name, int ignoreRow) {
         String uniqueName = name;
         int counter = 1;
 
-        while (isNameDuplicate(uniqueName)) {
+        while (isNameDuplicate(uniqueName, ignoreRow)) {
             uniqueName = name + " (" + counter + ")";
             counter++;
         }
@@ -260,16 +258,15 @@ public class MainWindow extends JFrame{
         return uniqueName;
     }
 
-    private boolean isNameDuplicate(String name) {
+    private boolean isNameDuplicate(String name, int ignoreRow) {
         DefaultTableModel model = (DefaultTableModel) passwordTable.getModel();
         for (int i = 0; i < model.getRowCount(); i++) {
-            if (name.equals(model.getValueAt(i, 0))) {
+            if (i != ignoreRow && name.equals(model.getValueAt(i, 0))) {
                 return true;
             }
         }
         return false;
     }
-
 
     private void setupButtonColumn(JTable table) {
         table.getColumnModel().getColumn(3).setCellRenderer(new TogglePasswordRenderer());
@@ -329,7 +326,7 @@ public class MainWindow extends JFrame{
     }
 
     public void save() {
-        Storage.savePasswords(MainWindow.this, m_masterpassword, m_accountName, null, null);
+        Storage.savePasswords(this, m_masterpassword, m_accountName, null, null);
         setModified(false);
     }
 

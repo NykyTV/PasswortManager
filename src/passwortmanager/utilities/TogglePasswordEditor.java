@@ -52,7 +52,7 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         String name = (String) model.getValueAt(row, 0);
         String username = (String) model.getValueAt(row, 1);
-        String password = loadPasswordForEntry(name, username, mainWindow.m_masterpassword, mainWindow.m_accountName);
+        String password = loadPasswordForEntry(name, username, mainWindow.getM_masterpassword(), mainWindow.getM_accountName());
 
         JTextField nameField = new JTextField(name);
         JTextField usernameField = new JTextField(username);
@@ -88,7 +88,7 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
             model.setValueAt("*".repeat(newPassword.length()), row, 2);
 
             // Sofortige Speicherung des Passworts im Storage
-            Storage.savePasswords(mainWindow, mainWindow.m_masterpassword, mainWindow.m_accountName, nameField.getText(), newPassword);
+            Storage.savePasswords(mainWindow, mainWindow.getM_masterpassword(), mainWindow.getM_accountName(), nameField.getText(), newPassword);
             //mainWindow.setModified(true);
         } else if (result == JOptionPane.CANCEL_OPTION) {
             fireEditingStopped();
@@ -112,7 +112,7 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         String name = (String) model.getValueAt(row, 0);
         String username = (String) model.getValueAt(row, 1);
-        String realPassword = loadPasswordForEntry(name, username, mainWindow.m_masterpassword, mainWindow.m_accountName);
+        String realPassword = loadPasswordForEntry(name, username, mainWindow.getM_masterpassword(), mainWindow.getM_accountName());
 
         if (realPassword != null) {
             isPasswordVisible = !isPasswordVisible; // Toggle the state
@@ -133,7 +133,7 @@ public class TogglePasswordEditor extends AbstractCellEditor implements TableCel
         String name = (String) model.getValueAt(row, 0);
         String username = (String) model.getValueAt(row, 1);
         try {
-            String password = loadPasswordForEntry(name, username, mainWindow.m_masterpassword, mainWindow.m_accountName);
+            String password = loadPasswordForEntry(name, username, mainWindow.getM_masterpassword(), mainWindow.getM_accountName());
             if (password != null) {
                 StringSelection stringSelection = new StringSelection(password);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

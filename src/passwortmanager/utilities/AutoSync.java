@@ -4,8 +4,6 @@ import org.json.simple.JSONObject;
 import passwortmanager.window.MainWindow;
 
 import java.io.File;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
 

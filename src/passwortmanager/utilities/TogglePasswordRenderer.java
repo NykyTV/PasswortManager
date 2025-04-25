@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class TogglePasswordRenderer extends JPanel implements TableCellRenderer {
     private JPanel renderPanel;
-    private JButton deleteButton;
+    private JButton editButton;
     private JButton toggleButton;
     private JButton copyButton;
 
@@ -16,15 +16,15 @@ public class TogglePasswordRenderer extends JPanel implements TableCellRenderer 
 
         renderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        deleteButton = new JButton("DEL");
+        editButton = new JButton("\uD83D\uDD8A\uFE0F");
         toggleButton = new JButton("\uD83D\uDC41");
         copyButton = new JButton("\uD83D\uDCC4");
 
-        renderPanel.add(deleteButton);
+        renderPanel.add(editButton);
         renderPanel.add(toggleButton);
         renderPanel.add(copyButton);
 
-        deleteButton.setOpaque(true);
+        editButton.setOpaque(true);
         toggleButton.setOpaque(true);
         copyButton.setOpaque(true);
     }

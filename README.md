@@ -7,21 +7,24 @@
 - Verschlüsselung
 - Passwort generator
 - Suchfunktion
+- (optional mit Server)
 ```
-
-(optional mit Server)
-
-1. Swing UI Designer installieren
-2. Git installieren
-3. GitHub Account verbinden
-
-![image](https://github.com/user-attachments/assets/c111eb5e-bc7f-4ee1-b64f-51e9bf583291)
 
 ---
 
 ## Install PasswortManager Server (Debian 11)
 
-`wget installscript`
+```bash
+wget -O install.sh https://raw.githubusercontent.com/NykyTV/PasswortManager/refs/heads/develop/server-install/install.sh`
+sh install.sh
+```
+
+## Ports
+Forward following ports:
+```text
+- 8080/tcp (phpMyAdmin)
+- 3306/tcp (MySQL)
+```
 
 <details>
 <summary>Manual Installation</summary>
@@ -76,4 +79,13 @@ used in this project:
 ## Start Docker container
 ```bash
 docker compose up -d
+```
+
+## Settings in PasswordManager
+Beispiel:
+
+```text
+Datenbank-URL: jdbc:mysql://192.168.2.22:3306/passwortmanager
+Benutzername: root
+Passwort: deinPasswort
 ```

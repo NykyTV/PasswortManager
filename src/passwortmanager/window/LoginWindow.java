@@ -1,7 +1,10 @@
 package passwortmanager.window;
 
+import org.json.simple.JSONArray;
 import lombok.Getter;
 import org.json.simple.JSONObject;
+import passwortmanager.utilities.*;
+import passwortmanager.utilities.FileReader;
 import org.json.simple.parser.JSONParser;
 import passwortmanager.utilities.Darkmode;
 
@@ -10,13 +13,10 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.*;
 import java.util.List;
+
+import static passwortmanager.utilities.Storage.extractHostFromUrl;
 
 @Getter
 public class LoginWindow extends JFrame {
@@ -37,7 +37,7 @@ public class LoginWindow extends JFrame {
         super(title);
 
         this.setMinimumSize(new Dimension(330, 400));
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setContentPane(LoginWindow);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
@@ -75,7 +75,7 @@ public class LoginWindow extends JFrame {
         loginButton.setBackground(Color.WHITE);
         registerButton.setBackground(Color.WHITE);
 
-        List<JButton> buttonList = java.util.List.of(registerButton, loginButton);
+        List<JButton> buttonList = List.of(registerButton, loginButton);
         setButtonElementLocation(buttonList);
 
         //JLabels
@@ -86,7 +86,7 @@ public class LoginWindow extends JFrame {
         label_title.setForeground(new Color(0, 102, 204));
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
-        List<JLabel> labelList = java.util.List.of(label_title, benutzerText, passwortText);
+        List<JLabel> labelList = List.of(label_title, benutzerText, passwortText);
         setLabelElementLocation(labelList);
 
         //JTextField
@@ -96,15 +96,15 @@ public class LoginWindow extends JFrame {
         passwortEingabe = new JPasswordField(20);
         passwortEingabe.setMaximumSize(textFeldGroesse);
 
-        List<JTextField> textFieldList = java.util.List.of(benutzerNameEingabe, passwortEingabe);
+        List<JTextField> textFieldList = List.of(benutzerNameEingabe, passwortEingabe);
         setTextFieldElementLocation(textFieldList);
 
         arrangeComponents();
     }
 
     //Diese Funktion erstellt einen Abstand mit der übergebenen Höhe. Wird in "arrangeComponents()" verwendet.
-    private Component Abstand(int höhe) {
-        return Box.createVerticalStrut(höhe);
+    private Component Abstand(int hoehe) {
+        return Box.createVerticalStrut(hoehe);
     }
 
     //Diese Funktion ordnet die Komponenten richtig an.
@@ -132,7 +132,10 @@ public class LoginWindow extends JFrame {
     private void performRegistration() {
         String username = benutzerNameEingabe.getText();
         String password = passwortEingabe.getText();
-        File file = new File(username + ".json");
+
+        String filename = Common.getPasswordFilename(username);
+
+        File file = new File(filename);
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Benutzername und Passwort dürfen nicht leer sein", "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -142,84 +145,65 @@ public class LoginWindow extends JFrame {
         if (file.exists()) {
             JOptionPane.showMessageDialog(this, "Benutzername bereits vergeben", "Fehler", JOptionPane.ERROR_MESSAGE);
             return;
-        } else {
-            try {
-                file.createNewFile();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
-        if (saveCredentials(username, password)) {
+        try {
+            // lege leere Passwortliste an
+            JSONArray leereListe = new JSONArray();
+
+            FileReader.saveFile(leereListe, filename, password);
+
             JOptionPane.showMessageDialog(this, "Registrierung erfolgreich", "Erfolg", JOptionPane.INFORMATION_MESSAGE);
-        } else {
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Fehler: " + e.getMessage());
             JOptionPane.showMessageDialog(this, "Registrierung fehlgeschlagen", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private boolean saveCredentials(String username, String password) {
+    private boolean checkLogin(String username, String password) {
+        String filename = Common.getPasswordFilename(username);
+        File file = new File(filename);
+
+        // Server-Modus prüfen
+        if (SettingsLoader.isServerMode()) {
+            JSONObject settings = SettingsLoader.loadSettings();
+            String serverUrl = extractHostFromUrl((String) settings.get("url"));
+
+            if (Database.isServerAvailable(serverUrl, null)) {
+                // Versuche Datei vom Server zu holen
+                Database.loadUserFileFromDatabase(username, file, null);
+            } else {
+                JOptionPane.showMessageDialog(this, "Server nicht erreichbar. Anmeldung im Offline-Modus.", "Offline-Modus", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+
+        if (!file.exists()) return false;
+
         try {
-            String hashedPassword = hashPassword(password);
-            JSONObject credentials = loadCredentials();
-            credentials.put(username, hashedPassword);
-            Files.write(Paths.get(CREDENTIALS_FILE), credentials.toString().getBytes());
+            // versuche die Entschlüsselung – wenn es fehlschlägt → falsches Passwort
+            FileReader.loadFile(filename, password);
+
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private String getStoredHash(String username) throws Exception {
-        JSONObject credentials = loadCredentials();
-        return (String) credentials.get(username);
-    }
-
-    private JSONObject loadCredentials() throws Exception {
-        if (Files.exists(Paths.get(CREDENTIALS_FILE))) {
-            String content = new String(Files.readAllBytes(Paths.get(CREDENTIALS_FILE)));
-            JSONParser parser = new JSONParser();
-            return (JSONObject) parser.parse(new StringReader(content));
-        }
-        return new JSONObject();
-    }
-
-    private String hashPassword(String password) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] hashedBytes = md.digest(password.getBytes());
-        StringBuilder sb = new StringBuilder();
-        for (byte b : hashedBytes) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
-    }
-
-    private boolean checkLogin(String username, String password) {
-        try {
-            String storedHash = getStoredHash(username);
-            if (storedHash == null) return false;
-            String inputHash = hashPassword(password);
-            return storedHash.equals(inputHash);
-        } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
 
     private void setButtonElementLocation(List<JButton> buttonList) {
         for (JButton jButton : buttonList) {
-            jButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            jButton.setAlignmentX(CENTER_ALIGNMENT);
         }
     }
     private void setTextFieldElementLocation(List<JTextField> textFieldList) {
         for (JTextField jTextField : textFieldList) {
-            jTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
+            jTextField.setAlignmentX(CENTER_ALIGNMENT);
         }
     }
 
     private void setLabelElementLocation(List<JLabel> labelList) {
         for (JLabel jLabel : labelList) {
-            jLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            jLabel.setAlignmentX(CENTER_ALIGNMENT);
         }
     }
 }

@@ -1,5 +1,7 @@
 package passwortmanager.utilities;
 
+import lombok.Getter;
+import lombok.Setter;
 import passwortmanager.window.LoginWindow;
 import passwortmanager.window.MainWindow;
 
@@ -12,7 +14,10 @@ import java.util.List;
 public class Darkmode {
     private LoginWindow loginUtility;
     private MainWindow mainUtility;
-    public Boolean darkMode;
+
+    @Getter
+    @Setter
+    private Boolean darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
 
     public void activateDarkMode(boolean active) {
         Color buttonFarbe;
@@ -40,27 +45,27 @@ public class Darkmode {
         //Hier werden die Farben der Komponenten im Mainwindow angepasst.
         if (mainUtility != null) {
             //Buttons
-            List<JButton> buttonList = List.of(mainUtility.button_logout, mainUtility.button_GeneratePW, mainUtility.button_ADD, mainUtility.button_Save);
+            List<JButton> buttonList = List.of(mainUtility.getButton_logout(), mainUtility.getButton_GeneratePW(), mainUtility.getButton_ADD(), mainUtility.getButton_Save());
             setButtonBackground(buttonList, buttonFarbe);
 
             //Labels
-            mainUtility.label_AppName.setForeground(titelFarbe);
-            List<JLabel> labelList = List.of(mainUtility.label_EntryName, mainUtility.label_Username, mainUtility.label_Password);
+            mainUtility.getLabel_AppName().setForeground(titelFarbe);
+            List<JLabel> labelList = List.of(mainUtility.getLabel_EntryName(), mainUtility.getLabel_Username(), mainUtility.getLabel_Password());
             setLabelForeground(labelList, textFarbe);
 
             //Panels
-            List<JPanel> panelList = List.of(mainUtility.TopPanel, mainUtility.MidPanel);
+            List<JPanel> panelList = List.of(mainUtility.getTopPanel(), mainUtility.getMidPanel());
             setPanelBackground(panelList, hintergrundFarbe);
 
             //Textfelder
-            List<JTextField> textFieldList = List.of(mainUtility.textfield_EntryName, mainUtility.textfield_Username, mainUtility.textfield_Password);
+            List<JTextField> textFieldList = List.of(mainUtility.getTextfield_EntryName(), mainUtility.getTextfield_Username(), mainUtility.getTextfield_Password());
             setFarbeTextField(textFieldList);
 
             //Passworttabelle
-            mainUtility.passwordTable.setForeground(textFarbe);
-            mainUtility.passwordTable.setBackground(hintergrundFarbe);
-            mainUtility.passwordTable.setSelectionBackground(Color.LIGHT_GRAY);
-            JTableHeader header = mainUtility.passwordTable.getTableHeader();
+            mainUtility.getPasswordTable().setForeground(textFarbe);
+            mainUtility.getPasswordTable().setBackground(hintergrundFarbe);
+            mainUtility.getPasswordTable().setSelectionBackground(Color.LIGHT_GRAY);
+            JTableHeader header = mainUtility.getPasswordTable().getTableHeader();
             header.setBackground(hintergrundFarbe);
             header.setForeground(textFarbe);
 
@@ -70,16 +75,16 @@ public class Darkmode {
         //Hier werden die Farben der Komponenten im Loginwindow angepasst.
         if (loginUtility != null) {
             //Buttons
-            List<JButton> buttonList = List.of(loginUtility.loginButton, loginUtility.registerButton);
+            List<JButton> buttonList = List.of(loginUtility.getLoginButton(), loginUtility.getRegisterButton());
             setButtonBackground(buttonList, buttonFarbe);
 
             //Labels
-            loginUtility.label_title.setForeground(titelFarbe);
-            List<JLabel> labelList = List.of(loginUtility.benutzerText, loginUtility.passwortText);
+            loginUtility.getLabel_title().setForeground(titelFarbe);
+            List<JLabel> labelList = List.of(loginUtility.getBenutzerText(), loginUtility.getPasswortText());
             setLabelForeground(labelList, textFarbe);
 
             //Textfelder
-            List<JTextField> textFieldList = List.of(loginUtility.benutzerNameEingabe, loginUtility.passwortEingabe);
+            List<JTextField> textFieldList = List.of(loginUtility.getBenutzerNameEingabe(), loginUtility.getPasswortEingabe());
             setFarbeTextField(textFieldList);
         }
     }
@@ -109,9 +114,9 @@ public class Darkmode {
     private List<JPanel> createPanelListe() {
         List<JPanel> panelList = List.of();
         if (loginUtility != null) {
-            panelList = List.of(loginUtility.LoginWindow);
+            panelList = List.of(loginUtility.getLoginWindow());
         }else if (mainUtility != null) {
-            panelList = List.of(mainUtility.MainPanel);
+            panelList = List.of(mainUtility.getMainPanel());
         }
         return panelList;
     }
@@ -136,7 +141,7 @@ public class Darkmode {
     }
 
     //Diese Funktion holt den Wert "darkMode" aus der Datei "settings.json"
-    public boolean getDarkmode() {
+    public boolean loadDarkModeFromFile() {
         if (loginUtility != null) {
             try{
                 darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
@@ -151,11 +156,11 @@ public class Darkmode {
 
     public Darkmode(LoginWindow loginUtility) {
         this.loginUtility = loginUtility;
-        getDarkmode();
+        loadDarkModeFromFile();
     }
 
     public Darkmode(MainWindow mainUtility) {
         this.mainUtility = mainUtility;
-        getDarkmode();
+        loadDarkModeFromFile();
     }
 }

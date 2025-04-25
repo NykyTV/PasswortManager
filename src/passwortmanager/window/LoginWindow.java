@@ -1,36 +1,37 @@
 package passwortmanager.window;
 
+import lombok.Getter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import passwortmanager.utilities.*;
-import passwortmanager.utilities.FileReader;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.File;
 import java.util.List;
 
 import static passwortmanager.utilities.Storage.extractHostFromUrl;
 
+@Getter
 public class LoginWindow extends JFrame {
 
-    private Darkmode darkmodeUtility;
-    public JLabel label_title;
-    public JPanel LoginWindow;
-    public JButton loginButton;
-    public JButton registerButton;
-    public JTextField benutzerNameEingabe;
-    public JTextField passwortEingabe;
-    public JLabel benutzerText;
-    public JLabel passwortText;
+    private Darkmode darkmodeUtility = new Darkmode(this);
+    private JLabel label_title;
+    private JPanel LoginWindow = new JPanel();
+    private JButton loginButton;
+    private JButton registerButton;
+    private JTextField benutzerNameEingabe;
+    private JTextField passwortEingabe;
+    private JLabel benutzerText;
+    private JLabel passwortText;
+    private static final String CREDENTIALS_FILE = "credentials.json";
+    private static final String SETTINGS_FILE = "settings.json";
 
     public LoginWindow(String title) {
         super(title);
-        LoginWindow = new JPanel();
-        darkmodeUtility = new Darkmode(this);
 
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -42,7 +43,7 @@ public class LoginWindow extends JFrame {
 
         addComponents();
         setupActionListeners();
-        darkmodeUtility.activateDarkMode(darkmodeUtility.darkMode);
+        darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
         setVisible(true);
     }
 

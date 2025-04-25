@@ -140,11 +140,27 @@ public class Darkmode {
         }
     }
 
+    //Diese Funktion holt den Wert "darkMode" aus der Datei "settings.json"
+    public boolean loadDarkModeFromFile() {
+        if (loginUtility != null) {
+            try{
+                darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
+            }catch (Exception _) {}
+        }else if (mainUtility != null) {
+            try{
+                darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
+            }catch (Exception _) {}
+        }
+        return darkMode;
+    }
+
     public Darkmode(LoginWindow loginUtility) {
         this.loginUtility = loginUtility;
+        loadDarkModeFromFile();
     }
 
     public Darkmode(MainWindow mainUtility) {
         this.mainUtility = mainUtility;
+        loadDarkModeFromFile();
     }
 }

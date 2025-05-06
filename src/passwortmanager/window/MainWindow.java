@@ -61,11 +61,11 @@ public class MainWindow extends JFrame{
         m_masterpassword = masterPassword;
         m_accountName = accountName;
 
-        Storage.loadPasswords(this, masterPassword, accountName);
-        setVisible(true);
-
         button_ADD.setEnabled(false);
         button_Save.setEnabled(false);
+
+        Storage.loadPasswords(this, masterPassword, accountName);
+        setVisible(true);
 
         darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
         button_Show.setText("\uD83D\uDC41"); // "auge icon" setzen da in from Editor nicht möglich

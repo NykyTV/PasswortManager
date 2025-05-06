@@ -9,6 +9,8 @@
 - Suchfunktion
 - (optional mit Server)
 ```
+Used Icon:
+`https://www.flaticon.com/de/kostenloses-icon/passwortmanager_5206964`
 
 ---
 

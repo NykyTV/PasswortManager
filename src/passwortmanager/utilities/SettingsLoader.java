@@ -14,13 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class SettingsLoader {
-    private static final String SETTINGS_FILE = "settings.json";
+
 
     // Bestehende Settings laden
     public static JSONObject loadSettings() {
         try {
             JSONParser parser = new JSONParser();
-            return (JSONObject) parser.parse(new FileReader(SETTINGS_FILE));
+            return (JSONObject) parser.parse(new FileReader(Common.SETTINGS_FILE));
         } catch (Exception e) {
             e.printStackTrace();
             return new JSONObject(); // leeres Objekt bei Fehler oder Datei nicht vorhanden
@@ -32,7 +32,7 @@ public class SettingsLoader {
         try {
             JSONObject settings = loadSettings();
             settings.put("darkMode", darkMode);
-            Files.write(Paths.get(SETTINGS_FILE), settings.toString().getBytes());
+            Files.write(Paths.get(Common.SETTINGS_FILE), settings.toString().getBytes());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -138,7 +138,7 @@ public class SettingsLoader {
             settings.put("serverMode", String.valueOf(serverModeCheckbox.isSelected()));
             settings.put("darkMode", darkModeCheckbox.isSelected());
 
-            try (FileWriter writer = new FileWriter(SETTINGS_FILE)) {
+            try (FileWriter writer = new FileWriter(Common.SETTINGS_FILE)) {
                 writer.write(settings.toString());
                 JOptionPane.showMessageDialog(parent, "Einstellungen gespeichert.");
 

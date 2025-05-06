@@ -27,8 +27,6 @@ public class LoginWindow extends JFrame {
     private JTextField passwortEingabe;
     private JLabel benutzerText;
     private JLabel passwortText;
-    private static final String CREDENTIALS_FILE = "credentials.json";
-    private static final String SETTINGS_FILE = "settings.json";
 
     public LoginWindow(String title) {
         super(title);

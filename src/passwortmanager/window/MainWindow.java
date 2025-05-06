@@ -41,7 +41,6 @@ public class MainWindow extends JFrame{
     private JButton button_Show;
     private JButton settingsButton;
     private JLabel statusLabel;
-    private static final String SETTINGS_FILE = "settings.json";
 
     // Local Variables
     private String m_masterpassword;
@@ -291,8 +290,8 @@ public class MainWindow extends JFrame{
     }
 
     public JSONObject loadSettings() throws Exception {
-        if (Files.exists(Paths.get(SETTINGS_FILE))) {
-            String content = new String(Files.readAllBytes(Paths.get(SETTINGS_FILE)));
+        if (Files.exists(Paths.get(Common.SETTINGS_FILE))) {
+            String content = new String(Files.readAllBytes(Paths.get(Common.SETTINGS_FILE)));
             JSONParser parser = new JSONParser();
             return (JSONObject) parser.parse(new StringReader(content));
         }

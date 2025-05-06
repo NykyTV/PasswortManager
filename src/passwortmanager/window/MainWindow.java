@@ -43,7 +43,7 @@ public class MainWindow extends JFrame{
     public JPanel MidPanel;
     public JScrollPane scrollBarPane;
     private DefaultTableModel tableModel;
-    ImageIcon icon = new ImageIcon("K:\\Documents\\Java\\PasswortManager\\src\\passwortmanager\\resources\\Pixelart1.jpg");
+    ImageIcon icon = new ImageIcon("K:\\Documents\\Java\\PasswortManager\\src\\passwortmanager\\resources\\Icon32px.png");
 
     // Local Variables
     private String m_masterpassword;

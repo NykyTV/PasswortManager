@@ -8,6 +8,7 @@ import passwortmanager.window.MainWindow;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -21,9 +22,19 @@ public class SettingsLoader {
         try {
             JSONParser parser = new JSONParser();
             return (JSONObject) parser.parse(new FileReader(Common.SETTINGS_FILE));
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
+            JSONObject settings = new JSONObject();
+            settings.put("darkMode", false);
+            try {
+                Files.write(Paths.get(Common.SETTINGS_FILE), settings.toString().getBytes());
+            }catch (Exception ex) {
+                ex.printStackTrace();
+                return settings; // nur darkmode = false bei Datei nicht vorhanden
+            }
+            return settings; // nur darkmode = false bei Datei nicht vorhanden
+        }catch (Exception e) {
             e.printStackTrace();
-            return new JSONObject(); // leeres Objekt bei Fehler oder Datei nicht vorhanden
+            return new JSONObject(); // leeres Objekt bei Fehler
         }
     }
 

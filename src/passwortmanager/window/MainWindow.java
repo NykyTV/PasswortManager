@@ -41,7 +41,6 @@ public class MainWindow extends JFrame{
     private JButton button_Show;
     private JButton settingsButton;
     private JLabel statusLabel;
-    ImageIcon icon = new ImageIcon("K:\\Documents\\Java\\PasswortManager\\src\\passwortmanager\\resources\\Icon32px.png");
 
     // Local Variables
     private String m_masterpassword;
@@ -51,7 +50,7 @@ public class MainWindow extends JFrame{
 
     public MainWindow(String title, String masterPassword, String accountName) {
         super(title + " | " + accountName);
-        this.setIconImage(icon.getImage());
+        Common.setAppIcon(this);
         setContentPane(MainPanel);
         MainPanel.setOpaque(true);
         darkmodeUtility = new Darkmode(this);
@@ -83,7 +82,7 @@ public class MainWindow extends JFrame{
     private void addListeners() {
         button_logout.addActionListener(_ -> logout());
         button_GeneratePW.addActionListener(_ -> {
-            new GeneratePassword().showPopupWindow(e -> {
+            new GeneratePassword().showPopupWindow(this, e -> {
                 String pw = e.getSource().toString();
                 textfield_Password.setText(pw);
             });

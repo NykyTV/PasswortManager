@@ -1,10 +1,11 @@
 package passwortmanager.utilities;
 
 import javax.swing.*;
+import java.util.Objects;
 
 public class Common {
 
-    private static ImageIcon icon = new ImageIcon("K:\\Documents\\Java\\PasswortManager\\src\\passwortmanager\\resources\\Icon32px.png");
+    private static ImageIcon icon = new ImageIcon(Objects.requireNonNull(Common.class.getResource("/passwortmanager/resources/Icon32px.png")));
     public static final String SETTINGS_FILE = "settings.json";
 
     public static String getPasswordFilename(String accountName) {

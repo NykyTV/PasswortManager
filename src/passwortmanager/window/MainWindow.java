@@ -234,8 +234,8 @@ public class MainWindow extends JFrame{
             // Save immediately with the actual password
             Storage.savePasswords(this, m_masterpassword, m_accountName, name, password);
 
-            setModified(true);
             button_ADD.setEnabled(false);
+            button_Save.setEnabled(false);
 
             textfield_EntryName.setText("");
             textfield_Username.setText("");

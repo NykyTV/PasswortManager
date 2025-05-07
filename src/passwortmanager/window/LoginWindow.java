@@ -22,11 +22,14 @@ public class LoginWindow extends JFrame {
     private JLabel label_title;
     private JPanel LoginWindow = new JPanel();
     private JButton loginButton;
+    private JButton zuruekButton;
     private JButton registerButton;
     private JTextField benutzerNameEingabe;
     private JTextField passwortEingabe;
+    private JTextField passwortBestaetigenEingabe;
     private JLabel benutzerText;
     private JLabel passwortText;
+    private JLabel passwortBestaetigenText;
 
     public LoginWindow(String title) {
         super(title);
@@ -47,10 +50,21 @@ public class LoginWindow extends JFrame {
 
     private void setupActionListeners() {
         loginButton.addActionListener(_ -> performLogin());
+        zuruekButton.addActionListener(_ -> zurueck());
         registerButton.addActionListener(_ -> performRegistration());
 
         // Fügen Sie einen KeyListener zum Passwort-Feld hinzu
         passwortEingabe.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    performLogin();
+                }
+            }
+        });
+
+        // Fügen Sie einen KeyListener zum PasswortBestätigen-Feld hinzu
+        passwortBestaetigenEingabe.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -66,32 +80,43 @@ public class LoginWindow extends JFrame {
 
         //Buttons
         loginButton = new JButton("Login");
-        registerButton = new JButton("Register");
+        zuruekButton = new JButton("Zurück");
+        registerButton = new JButton("Registeren");
         loginButton.setBackground(Color.WHITE);
+        zuruekButton.setBackground(Color.WHITE);
         registerButton.setBackground(Color.WHITE);
 
-        List<JButton> buttonList = List.of(registerButton, loginButton);
+        List<JButton> buttonList = List.of(registerButton, loginButton, zuruekButton);
         setButtonElementLocation(buttonList);
 
         //JLabels
-        benutzerText = new JLabel("Geben Sie Ihren Benutzername ein");
-        passwortText = new JLabel("Geben Sie Ihr Passwort ein");
+        benutzerText = new JLabel("Benutzername");
+        passwortText = new JLabel("Passwort");
+        passwortBestaetigenText = new JLabel("Passwort bestätigen");
+        passwortBestaetigenText.setVisible(false);
         label_title = new JLabel("Passwort Manager");
         label_title.setFont(new Font("Arial", Font.BOLD, 24));
         label_title.setForeground(new Color(0, 102, 204));
         label_title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
-        List<JLabel> labelList = List.of(label_title, benutzerText, passwortText);
+        List<JLabel> labelList = List.of(label_title, benutzerText, passwortText, passwortBestaetigenText);
         setLabelElementLocation(labelList);
 
         //JTextField
         benutzerNameEingabe = new JTextField(20);
         benutzerNameEingabe.setMaximumSize(textFeldGroesse);
         benutzerNameEingabe.setBorder(textFeldBorder);
+
         passwortEingabe = new JPasswordField(20);
         passwortEingabe.setMaximumSize(textFeldGroesse);
+        passwortEingabe.setBorder(textFeldBorder);
 
-        List<JTextField> textFieldList = List.of(benutzerNameEingabe, passwortEingabe);
+        passwortBestaetigenEingabe = new JPasswordField(20);
+        passwortBestaetigenEingabe.setMaximumSize(textFeldGroesse);
+        passwortBestaetigenEingabe.setBorder(textFeldBorder);
+        passwortBestaetigenEingabe.setVisible(false);
+
+        List<JTextField> textFieldList = List.of(benutzerNameEingabe, passwortEingabe, passwortBestaetigenEingabe);
         setTextFieldElementLocation(textFieldList);
 
         arrangeComponents();
@@ -104,7 +129,13 @@ public class LoginWindow extends JFrame {
 
     //Diese Funktion ordnet die Komponenten richtig an.
     public void arrangeComponents() {
-        List<Component> liste = List.of(label_title, Abstand(30), benutzerText, benutzerNameEingabe, Abstand(20), passwortText, passwortEingabe, Abstand(75), loginButton, Abstand(10), registerButton);
+        List<Component> liste;
+        if (registerButton.getText().equals("Bestätigen")){
+            liste = List.of(label_title, Abstand(30), benutzerText, benutzerNameEingabe, Abstand(20), passwortText, passwortEingabe, Abstand(20), passwortBestaetigenText, passwortBestaetigenEingabe, Abstand(40), zuruekButton, Abstand(10), registerButton);
+        } else {
+            liste = List.of(label_title, Abstand(30), benutzerText, benutzerNameEingabe, Abstand(20), passwortText, passwortEingabe, Abstand(20), passwortBestaetigenText, passwortBestaetigenEingabe, Abstand(75), loginButton, Abstand(10), registerButton);
+        }
+        LoginWindow.removeAll();
         for (Component component : liste) {
             LoginWindow.add(component);
         }
@@ -125,34 +156,51 @@ public class LoginWindow extends JFrame {
     }
 
     private void performRegistration() {
-        String username = benutzerNameEingabe.getText();
-        String password = passwortEingabe.getText();
+        if (registerButton.getText().equals("Registeren")){
+            passwortBestaetigenEingabe.setVisible(true);
+            passwortBestaetigenText.setVisible(true);
+            registerButton.setText("Bestätigen");
+            arrangeComponents();
+        } else if (registerButton.getText().equals("Bestätigen")) {
+            String username = benutzerNameEingabe.getText();
+            String password = passwortEingabe.getText();
+            String passwordBestaetigen = passwortBestaetigenEingabe.getText();
 
-        String filename = Common.getPasswordFilename(username);
+            String filename = Common.getPasswordFilename(username);
 
-        File file = new File(filename);
+            File file = new File(filename);
 
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Benutzername und Passwort dürfen nicht leer sein", "Fehler", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Benutzername und Passwort dürfen nicht leer sein", "Fehler", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        if (file.exists()) {
-            JOptionPane.showMessageDialog(this, "Benutzername bereits vergeben", "Fehler", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            if (file.exists()) {
+                JOptionPane.showMessageDialog(this, "Benutzername bereits vergeben", "Fehler", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        try {
-            // lege leere Passwortliste an
-            JSONArray leereListe = new JSONArray();
+            if (!password.equals(passwordBestaetigen)) {
+                JOptionPane.showMessageDialog(this, "Passwörter stimmen nicht überein", "Fehler", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            FileReader.saveFile(leereListe, filename, password);
+            try {
+                // lege leere Passwortliste an
+                JSONArray leereListe = new JSONArray();
 
-            JOptionPane.showMessageDialog(this, "Registrierung erfolgreich", "Erfolg", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Fehler: " + e.getMessage());
-            JOptionPane.showMessageDialog(this, "Registrierung fehlgeschlagen", "Fehler", JOptionPane.ERROR_MESSAGE);
+                FileReader.saveFile(leereListe, filename, password);
+
+                JOptionPane.showMessageDialog(this, "Registrierung erfolgreich", "Erfolg", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Fehler: " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "Registrierung fehlgeschlagen", "Fehler", JOptionPane.ERROR_MESSAGE);
+            }
+            passwortBestaetigenEingabe.setVisible(false);
+            passwortBestaetigenText.setVisible(false);
+            registerButton.setText("Registeren");
+            arrangeComponents();
         }
     }
 
@@ -200,5 +248,12 @@ public class LoginWindow extends JFrame {
         for (JLabel jLabel : labelList) {
             jLabel.setAlignmentX(CENTER_ALIGNMENT);
         }
+    }
+
+    private void zurueck() {
+        passwortBestaetigenEingabe.setVisible(false);
+        passwortBestaetigenText.setVisible(false);
+        registerButton.setText("Registeren");
+        arrangeComponents();
     }
 }

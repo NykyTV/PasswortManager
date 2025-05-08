@@ -50,6 +50,7 @@ public class MainWindow extends JFrame{
 
     public MainWindow(String title, String masterPassword, String accountName) {
         super(title + " | " + accountName);
+        Common.setAppIcon(this);
         setContentPane(MainPanel);
         MainPanel.setOpaque(true);
         darkmodeUtility = new Darkmode(this);
@@ -81,7 +82,7 @@ public class MainWindow extends JFrame{
     private void addListeners() {
         button_logout.addActionListener(_ -> logout());
         button_GeneratePW.addActionListener(_ -> {
-            new GeneratePassword().showPopupWindow(e -> {
+            new GeneratePassword().showPopupWindow(this, e -> {
                 String pw = e.getSource().toString();
                 textfield_Password.setText(pw);
             });

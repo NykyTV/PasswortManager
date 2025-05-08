@@ -33,7 +33,7 @@ public class LoginWindow extends JFrame {
 
     public LoginWindow(String title) {
         super(title);
-
+        Common.setAppIcon(this);
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setContentPane(LoginWindow);

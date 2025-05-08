@@ -41,7 +41,7 @@ public class SettingsLoader {
     }
 
     // === Singleton access ===
-    public static SettingsLoader getInstance() {
+    public synchronized static SettingsLoader getInstance() {
         if (instance == null) {
             instance = loadFromFile();
         }

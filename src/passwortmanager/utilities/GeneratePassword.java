@@ -9,9 +9,8 @@ public class GeneratePassword {
 
     private final SecureRandom random = new SecureRandom();
 
-    public void showPopupWindow(ActionListener onPasswordGenerated) {
-        JDialog popup = new JDialog();
-        popup.setTitle("Generator");
+    public void showPopupWindow(JFrame parent, ActionListener onPasswordGenerated) {
+        JDialog popup = new JDialog(parent, "Generator", true);
         popup.setSize(600, 250);
         popup.setLayout(new BorderLayout());
 

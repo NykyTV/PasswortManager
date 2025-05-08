@@ -284,21 +284,6 @@ public class MainWindow extends JFrame{
         darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
     }
 
-    private String getSettings(String username) throws Exception {
-        JSONObject settings = loadSettings();
-        return (String) settings.get(username);
-    }
-
-    public JSONObject loadSettings() throws Exception {
-        if (Files.exists(Paths.get(Common.SETTINGS_FILE))) {
-            String content = new String(Files.readAllBytes(Paths.get(Common.SETTINGS_FILE)));
-            JSONParser parser = new JSONParser();
-            return (JSONObject) parser.parse(new StringReader(content));
-        }
-        return new JSONObject();
-    }
-
-
     public DefaultTableModel getPasswordTableModel() {
         return (DefaultTableModel) passwordTable.getModel();
     }

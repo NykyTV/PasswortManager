@@ -161,9 +161,8 @@ public class LoginWindow extends JFrame {
         File file = new File(filename);
 
         // Server-Modus prüfen
-        if (SettingsLoader.isServerMode()) {
-            JSONObject settings = SettingsLoader.loadSettings();
-            String serverUrl = extractHostFromUrl((String) settings.get("url"));
+        if (SettingsLoader.getInstance().isServerMode()) {
+            String serverUrl = extractHostFromUrl(SettingsLoader.getInstance().getUrl());
 
             if (Database.isServerAvailable(serverUrl, null)) {
                 // Versuche Datei vom Server zu holen

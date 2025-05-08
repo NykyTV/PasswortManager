@@ -48,9 +48,9 @@ public class Storage {
             JOptionPane.showMessageDialog(mainWindow, e.getMessage(), "Fehler", JOptionPane.ERROR_MESSAGE);
         }
 
-        if (SettingsLoader.isServerMode()) {
-            JSONObject settings = SettingsLoader.loadSettings();
-            String serverUrl = extractHostFromUrl((String) settings.get("url"));
+        if (SettingsLoader.getInstance().isServerMode()) {
+
+            String serverUrl = extractHostFromUrl(SettingsLoader.getInstance().getUrl());
 
             if (Database.isServerAvailable(serverUrl, mainWindow)) {
                 Database.saveUserFileToDatabase(accountName, new File(filename), mainWindow);
@@ -67,9 +67,8 @@ public class Storage {
         String filename = Common.getPasswordFilename(accountName);
         File file = new File(filename);
 
-        if (SettingsLoader.isServerMode()) {
-            JSONObject settings = SettingsLoader.loadSettings();
-            String serverUrl = extractHostFromUrl((String) settings.get("url"));
+        if (SettingsLoader.getInstance().isServerMode()) {
+            String serverUrl = extractHostFromUrl(SettingsLoader.getInstance().getUrl());
 
             if (Database.isServerAvailable(serverUrl, mainWindow)) {
                 Database.loadUserFileFromDatabase(accountName, file, mainWindow);

@@ -1,65 +1,115 @@
 package passwortmanager.utilities;
 
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import passwortmanager.window.MainWindow;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import lombok.Getter;
+
+import java.io.IOException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SettingsLoader {
+    private static SettingsLoader instance;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
+    // === Fields ===
+    @Getter private String url;
+    @Getter private boolean serverMode;
+    @Getter private String password;
+    @Getter private boolean darkMode;
+    @Getter private String user;
 
-    // Bestehende Settings laden
-    public static JSONObject loadSettings() {
+    // === Private constructor with default values ===
+    private SettingsLoader() {
+        this.url = "jdbc:mysql://127.0.0.1:3306/passwortmanager ";
+        this.serverMode = false;
+        this.password = "deinPasswort";
+        this.darkMode = false;
+        this.user = "root";
+    }
+
+    // === Ensures any missing field is set to its default ===
+    private static void fillMissingDefaults(SettingsLoader s) {
+        if (s.url == null) s.url = "jdbc:mysql://127.0.0.1:3306/passwortmanager ";
+        if (s.password == null) s.password = "deinPasswort";
+        if (s.user == null) s.user = "root";
+        // booleans default to false, so no check needed
+    }
+
+    // === Singleton access ===
+    public static SettingsLoader getInstance() {
+        if (instance == null) {
+            instance = loadFromFile();
+        }
+        return instance;
+    }
+
+    // === Property setters with auto-save ===
+    public void setUrl(String url) {
+        this.url = url;
+        saveToFile();
+    }
+
+    public void setServerMode(boolean serverMode) {
+        this.serverMode = serverMode;
+        saveToFile();
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+        saveToFile();
+    }
+
+    public void setDarkMode(boolean darkMode) {
+        this.darkMode = darkMode;
+        saveToFile();
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+        saveToFile();
+    }
+
+    // === File operations ===
+    private static SettingsLoader loadFromFile() {
         try {
-            JSONParser parser = new JSONParser();
-            return (JSONObject) parser.parse(new FileReader(Common.SETTINGS_FILE));
-        } catch (FileNotFoundException e) {
-            JSONObject settings = new JSONObject();
-            settings.put("darkMode", false);
-            try {
-                Files.write(Paths.get(Common.SETTINGS_FILE), settings.toString().getBytes());
-            }catch (Exception ex) {
-                ex.printStackTrace();
-                return settings; // nur darkmode = false bei Datei nicht vorhanden
+            File file = new File(Common.SETTINGS_FILE);
+            if (file.exists()) {
+                SettingsLoader loaded = mapper.readValue(file, SettingsLoader.class);
+                fillMissingDefaults(loaded); // in case any fields are null
+                return loaded;
+            } else {
+                SettingsLoader defaultSettings = new SettingsLoader();
+                defaultSettings.saveToFile(); // create default file
+                return defaultSettings;
             }
-            return settings; // nur darkmode = false bei Datei nicht vorhanden
-        }catch (Exception e) {
-            e.printStackTrace();
-            return new JSONObject(); // leeres Objekt bei Fehler
+        } catch (IOException e) {
+            System.err.println("Failed to load settings: " + e.getMessage());
+            return new SettingsLoader();
         }
     }
 
-    // DarkMode speichern
-    public static boolean saveDarkModeSetting(boolean darkMode) {
+    private void saveToFile() {
         try {
-            JSONObject settings = loadSettings();
-            settings.put("darkMode", darkMode);
-            Files.write(Paths.get(Common.SETTINGS_FILE), settings.toString().getBytes());
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(Common.SETTINGS_FILE), this);
+        } catch (IOException e) {
+            System.err.println("Failed to save settings: " + e.getMessage());
         }
     }
 
     public static void showSettingsDialog(JFrame parent, String currentUsername) {
-        JSONObject settings = loadSettings();
+        SettingsLoader settings = SettingsLoader.getInstance();
         JDialog dialog = new JDialog(parent, "Einstellungen", true);
 
-        JTextField urlField = new JTextField((String) settings.getOrDefault("url", ""));
-        JTextField userField = new JTextField((String) settings.getOrDefault("user", ""));
-        JTextField passwordField = new JTextField((String) settings.getOrDefault("password", ""));
-        boolean serverMode = Boolean.parseBoolean((String) settings.getOrDefault("serverMode", "false"));
-        boolean darkMode = Boolean.parseBoolean(String.valueOf(settings.getOrDefault("darkMode", "false")));
+        JTextField urlField = new JTextField((String) settings.url);
+        JTextField userField = new JTextField((String) settings.user);
+        JTextField passwordField = new JTextField((String) settings.password);
+        boolean serverMode = settings.serverMode;
+        boolean darkMode = settings.darkMode;
 
         JCheckBox serverModeCheckbox = new JCheckBox("Nur Server-Modus verwenden", serverMode);
         JCheckBox darkModeCheckbox = new JCheckBox("Dark Mode aktivieren", darkMode);
@@ -143,21 +193,11 @@ public class SettingsLoader {
 
         JButton saveButton = new JButton("Speichern");
         saveButton.addActionListener(e -> {
-            settings.put("url", urlField.getText());
-            settings.put("user", userField.getText());
-            settings.put("password", passwordField.getText());
-            settings.put("serverMode", String.valueOf(serverModeCheckbox.isSelected()));
-            settings.put("darkMode", darkModeCheckbox.isSelected());
-
-            try (FileWriter writer = new FileWriter(Common.SETTINGS_FILE)) {
-                writer.write(settings.toString());
-                JOptionPane.showMessageDialog(parent, "Einstellungen gespeichert.");
-
-                dialog.dispose();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(parent, "Fehler beim Speichern!", "Fehler", JOptionPane.ERROR_MESSAGE);
-            }
+            settings.setUrl(urlField.getText());
+            settings.setUser(userField.getText());
+            settings.setPassword(passwordField.getText());
+            settings.setServerMode(serverModeCheckbox.isSelected());
+            settings.setDarkMode(darkModeCheckbox.isSelected());
 
             if (parent instanceof MainWindow) {
                 ((MainWindow) parent).performDarkmode();
@@ -177,11 +217,6 @@ public class SettingsLoader {
         dialog.setSize(600, 400);
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
-    }
-
-    public static boolean isServerMode() {
-        JSONObject settings = loadSettings();
-        return Boolean.parseBoolean((String) settings.getOrDefault("serverMode", "false"));
     }
 
     private static boolean validatePasswords(String oldPw, String newPw, String confirmPw, JFrame parent) {

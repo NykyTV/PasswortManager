@@ -150,6 +150,7 @@ public class SettingsLoader {
 
             if (parent instanceof MainWindow) {
                 ((MainWindow) parent).performDarkmode();
+                ((MainWindow) parent).updateSaveButtonIcon();
             }
         });
 

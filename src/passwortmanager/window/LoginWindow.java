@@ -123,7 +123,7 @@ public class LoginWindow extends JFrame {
     }
 
     //Diese Funktion erstellt einen Abstand mit der übergebenen Höhe. Wird in "arrangeComponents()" verwendet.
-    private Component Abstand(int hoehe) {
+    private Component abstand(int hoehe) {
         return Box.createVerticalStrut(hoehe);
     }
 
@@ -131,9 +131,9 @@ public class LoginWindow extends JFrame {
     public void arrangeComponents() {
         List<Component> liste;
         if (registerButton.getText().equals("Bestätigen")){
-            liste = List.of(label_title, Abstand(30), benutzerText, benutzerNameEingabe, Abstand(20), passwortText, passwortEingabe, Abstand(20), passwortBestaetigenText, passwortBestaetigenEingabe, Abstand(40), zuruekButton, Abstand(10), registerButton);
+            liste = List.of(label_title, abstand(30), benutzerText, benutzerNameEingabe, abstand(20), passwortText, passwortEingabe, abstand(20), passwortBestaetigenText, passwortBestaetigenEingabe, abstand(40), zuruekButton, abstand(10), registerButton);
         } else {
-            liste = List.of(label_title, Abstand(30), benutzerText, benutzerNameEingabe, Abstand(20), passwortText, passwortEingabe, Abstand(20), passwortBestaetigenText, passwortBestaetigenEingabe, Abstand(75), loginButton, Abstand(10), registerButton);
+            liste = List.of(label_title, abstand(30), benutzerText, benutzerNameEingabe, abstand(20), passwortText, passwortEingabe, abstand(20), passwortBestaetigenText, passwortBestaetigenEingabe, abstand(75), loginButton, abstand(10), registerButton);
         }
         LoginWindow.removeAll();
         for (Component component : liste) {

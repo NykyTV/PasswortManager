@@ -1,13 +1,42 @@
 package passwortmanager.utilities;
 
+import lombok.Getter;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.security.SecureRandom;
 
+@Getter
 public class GeneratePassword {
 
+    private Darkmode darkmodeUtility = new Darkmode(this);
     private final SecureRandom random = new SecureRandom();
+
+    //Panel
+    private JPanel leftPanel;
+    private JPanel checkboxPanel;
+    private JPanel centerPanel;
+    private JPanel bottomPanel;
+    private JPanel lengthPanel;
+    private JPanel rightPanel;
+
+    //CheckBox
+    private JCheckBox upperCase;
+    private JCheckBox lowerCase;
+    private JCheckBox digits;
+    private JCheckBox specialChars;
+
+    //TextField
+    private JTextField passwordField;
+    private JTextField lengthField;
+
+    //Button
+    private JButton regenerateBtn;
+    private JButton usePasswordBtn;
+
+    //Label
+    private JLabel titleLabel;
 
     public void showPopupWindow(JFrame parent, ActionListener onPasswordGenerated) {
         JDialog popup = new JDialog(parent, "Generator", true);
@@ -15,36 +44,36 @@ public class GeneratePassword {
         popup.setLayout(new BorderLayout());
 
         // Oben: Titel
-        JLabel titleLabel = new JLabel("Passwortgenerator", SwingConstants.CENTER);
+        titleLabel = new JLabel("Passwortgenerator", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
         popup.add(titleLabel, BorderLayout.NORTH);
 
         // Mitte: Hauptpanel
-        JPanel centerPanel = new JPanel();
+        centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         // Passwortausgabe
-        JTextField passwordField = new JTextField();
+        passwordField = new JTextField();
         passwordField.setEditable(false);
         passwordField.setFont(new Font("Monospaced", Font.PLAIN, 14));
         centerPanel.add(passwordField);
         centerPanel.add(Box.createVerticalStrut(10));
 
         // Länge
-        JPanel lengthPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lengthPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lengthPanel.add(new JLabel("Länge:"));
-        JTextField lengthField = new JTextField("20", 5);
+        lengthField = new JTextField("20", 5);
         lengthPanel.add(lengthField);
         centerPanel.add(lengthPanel);
 
         // Checkboxen
-        JCheckBox upperCase = new JCheckBox("A-Z", true);
-        JCheckBox lowerCase = new JCheckBox("a-z", true);
-        JCheckBox digits = new JCheckBox("0-9", true);
-        JCheckBox specialChars = new JCheckBox("!@#$%^&*", true);
+        upperCase = new JCheckBox("A-Z", true);
+        lowerCase = new JCheckBox("a-z", true);
+        digits = new JCheckBox("0-9", true);
+        specialChars = new JCheckBox("!@#$%^&*", true);
 
-        JPanel checkboxPanel = new JPanel(new GridLayout(2, 2, 10, 5));
+        checkboxPanel = new JPanel(new GridLayout(2, 2, 10, 5));
         checkboxPanel.add(upperCase);
         checkboxPanel.add(lowerCase);
         checkboxPanel.add(digits);
@@ -54,17 +83,18 @@ public class GeneratePassword {
         popup.add(centerPanel, BorderLayout.CENTER);
 
         // Unten: Panel mit zwei Buttons (links + rechts)
-        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel = new JPanel(new BorderLayout());
 
         // Links: Neu generieren
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton regenerateBtn = new JButton("Neu generieren");
+        leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        regenerateBtn = new JButton("Neu generieren");
+
         leftPanel.add(regenerateBtn);
         bottomPanel.add(leftPanel, BorderLayout.WEST);
 
         // Rechts: Dieses Passwort verwenden
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton usePasswordBtn = new JButton("Dieses Passwort verwenden");
+        rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        usePasswordBtn = new JButton("Dieses Passwort verwenden");
         rightPanel.add(usePasswordBtn);
         bottomPanel.add(rightPanel, BorderLayout.EAST);
 
@@ -104,6 +134,7 @@ public class GeneratePassword {
 
         // Initiales Passwort anzeigen
         updatePassword.run();
+        darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
 
         popup.setLocationRelativeTo(null);
         popup.setVisible(true);

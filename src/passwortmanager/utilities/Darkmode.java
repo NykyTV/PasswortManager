@@ -12,9 +12,10 @@ import java.awt.*;
 import java.util.List;
 
 public class Darkmode {
+    private GeneratePassword generatePasswordUtility;
     private LoginWindow loginUtility;
     private MainWindow mainUtility;
-    private TogglePasswordRenderer togglePasswordRenderer;
+    private TogglePasswordRenderer togglePasswordRendererUtility;
 
     @Getter
     @Setter
@@ -73,13 +74,32 @@ public class Darkmode {
 //            mainUtility.MainPanel.setBackground(buttonFarbe);
         }
 
-        if (togglePasswordRenderer != null) {
+        if (generatePasswordUtility != null) {
             //Buttons
-            List<JButton> buttonList = List.of(togglePasswordRenderer.getToggleButton(), togglePasswordRenderer.getCopyButton(), togglePasswordRenderer.getEditButton());
+            List<JButton> buttonList = List.of(generatePasswordUtility.getRegenerateBtn(), generatePasswordUtility.getUsePasswordBtn());
+            setButtonBackground(buttonList, buttonFarbe);
+
+            //Textfelder
+            List<JTextField> textFieldList = List.of(generatePasswordUtility.getPasswordField(), generatePasswordUtility.getLengthField());
+            setFarbeTextField(textFieldList);
+
+            //CheckBox
+            List<JCheckBox> checkBoxList = List.of(generatePasswordUtility.getUpperCase(), generatePasswordUtility.getLowerCase(), generatePasswordUtility.getDigits(), generatePasswordUtility.getSpecialChars());
+            setCheckBoxBackground(checkBoxList, hintergrundFarbe, textFarbe);
+
+            //Panels
+            List<JPanel> panelList = List.of(generatePasswordUtility.getCenterPanel(), generatePasswordUtility.getBottomPanel(), generatePasswordUtility.getCheckboxPanel(), generatePasswordUtility.getLeftPanel(), generatePasswordUtility.getLengthPanel(), generatePasswordUtility.getRightPanel());
+            setPanelBackground(panelList, hintergrundFarbe);
+//            generatePasswordUtility.getLengthPanel().set(textFarbe);
+        }
+
+        if (togglePasswordRendererUtility != null) {
+            //Buttons
+            List<JButton> buttonList = List.of(togglePasswordRendererUtility.getToggleButton(), togglePasswordRendererUtility.getCopyButton(), togglePasswordRendererUtility.getEditButton());
             setButtonBackground(buttonList, buttonFarbe);
 
             //Panels
-            List<JPanel> panelList = List.of(togglePasswordRenderer.getRenderPanel());
+            List<JPanel> panelList = List.of(togglePasswordRendererUtility.getRenderPanel());
             setPanelBackground(panelList, hintergrundFarbe);
         }
 
@@ -118,6 +138,14 @@ public class Darkmode {
     private void setPanelBackground(List<JPanel> panelList, Color hintergrundFarbe) {
         for (JPanel jPanel : panelList) {
             jPanel.setBackground(hintergrundFarbe);
+        }
+    }
+
+    //Diese Funktion setzt den Hintergrund von JPanel.
+    private void setCheckBoxBackground(List<JCheckBox> checkBoxList, Color hintergrundFarbe, Color textFarbe) {
+        for (JCheckBox jCheckBox : checkBoxList) {
+            jCheckBox.setBackground(hintergrundFarbe);
+            jCheckBox.setForeground(textFarbe);
         }
     }
 
@@ -176,7 +204,12 @@ public class Darkmode {
     }
 
     public Darkmode(TogglePasswordRenderer togglePasswordRenderer) {
-        this.togglePasswordRenderer = togglePasswordRenderer;
+        this.togglePasswordRendererUtility = togglePasswordRenderer;
+        loadDarkModeFromFile();
+    }
+
+    public Darkmode(GeneratePassword generatePassword) {
+        this.generatePasswordUtility = generatePassword;
         loadDarkModeFromFile();
     }
 }

@@ -27,7 +27,7 @@ public class FileReader {
             fos.write(encrypted);
 
         } catch (Exception e) {
-            throw new Exception("Fehler beim Speichern!");
+            throw new Exception("Fehler beim Speichern!", e);
         }
     }
 
@@ -57,7 +57,7 @@ public class FileReader {
             return (JSONArray) JSONValue.parse(decryptedJson);
 
         } catch (Exception e) {
-            throw new Exception("Fehler beim Laden der Datei!");
+            throw new Exception("Fehler beim Laden der Datei!", e);
         }
     }
 

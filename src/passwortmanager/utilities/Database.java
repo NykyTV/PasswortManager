@@ -61,7 +61,7 @@ public class Database {
     }
 
     public static void saveUserFileToDatabase(String accountName, File file, MainWindow mainWindow) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = getConnection()) {
             // Get server version first
             long serverVersion = getServerVersion(conn, accountName);
             long localVersion = FileReader.getFileVersion(file.getPath());
@@ -95,7 +95,7 @@ public class Database {
     }
 
     public static void loadUserFileFromDatabase(String accountName, File targetFile, MainWindow mainWindow) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = getConnection()) {
             if (conn == null) return;
 
             // Compare versions first

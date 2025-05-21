@@ -142,14 +142,12 @@ public class Darkmode {
 
     //Diese Funktion holt den Wert "darkMode" aus der Datei "settings.json"
     public boolean loadDarkModeFromFile() {
-        if (loginUtility != null) {
+        if ((loginUtility != null) || (mainUtility != null)) {
             try{
-                darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
-            }catch (Exception _) {}
-        }else if (mainUtility != null) {
-            try{
-                darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
-            }catch (Exception _) {}
+                darkMode = (Boolean) SettingsLoader.loadSettings().getOrDefault("darkMode", false);
+            }catch (Exception _) {
+                darkMode = false;
+            }
         }
         return darkMode;
     }

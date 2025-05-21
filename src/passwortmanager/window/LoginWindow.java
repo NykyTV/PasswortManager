@@ -30,7 +30,7 @@ public class LoginWindow extends JFrame {
 
     public LoginWindow(String title) {
         super(title);
-
+        Common.setAppIcon(this);
         this.setMinimumSize(new Dimension(330, 400));
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setContentPane(LoginWindow);
@@ -74,8 +74,8 @@ public class LoginWindow extends JFrame {
         setButtonElementLocation(buttonList);
 
         //JLabels
-        benutzerText = new JLabel("Geben Sie Ihren Benutzername ein");
-        passwortText = new JLabel("Geben Sie Ihr Passwort ein");
+        benutzerText = new JLabel("Benutzername");
+        passwortText = new JLabel("Passwort");
         label_title = new JLabel("Passwort Manager");
         label_title.setFont(new Font("Arial", Font.BOLD, 24));
         label_title.setForeground(new Color(0, 102, 204));

@@ -12,6 +12,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -62,14 +63,15 @@ public class MainWindow extends JFrame{
         m_masterpassword = masterPassword;
         m_accountName = accountName;
 
-        Storage.loadPasswords(this, masterPassword, accountName);
-        setVisible(true);
-
         button_ADD.setEnabled(false);
         button_Save.setEnabled(false);
 
+        Storage.loadPasswords(this, masterPassword, accountName);
+        setVisible(true);
+
         darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
         button_Show.setText("\uD83D\uDC41"); // "auge icon" setzen da in from Editor nicht möglich
+        updateSaveButtonIcon();
     }
 
     public static void main(String[] args)
@@ -332,5 +334,15 @@ public class MainWindow extends JFrame{
 
     public void setStatus(String status) {
         SwingUtilities.invokeLater(() -> statusLabel.setText(status));
+    }
+
+    public void updateSaveButtonIcon() {
+        if (SettingsLoader.isServerMode()) {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/passwortmanager/resources/push_icon.png"));
+            Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            button_Save.setIcon(new ImageIcon(img));
+        } else {
+            button_Save.setIcon(new ImageIcon(getClass().getResource("/passwortmanager/resources/save_icon.png")));
+        }
     }
 }

@@ -71,6 +71,8 @@ public class FileReader {
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] versionBytes = new byte[8];
             fis.read(versionBytes);
+
+            System.out.println("VersionBytes: " + bytesToLong(versionBytes));
             return bytesToLong(versionBytes);
         }
     }
@@ -92,6 +94,7 @@ public class FileReader {
             dos.writeLong(counter);
         }
 
+        System.out.println("Counter" + counter);
         return longToBytes(counter);
     }
 

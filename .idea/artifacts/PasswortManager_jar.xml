@@ -4,6 +4,7 @@
     <root id="archive" name="PasswortManager.jar">
       <element id="module-output" name="PasswortManager" />
       <element id="extracted-dir" path="$PROJECT_DIR$/json_simple.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/mysql-connector-j-9.2.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

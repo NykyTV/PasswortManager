@@ -148,6 +148,7 @@ public class Database {
             stmt.setString(1, accountName);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    System.out.println("Database version: " + rs.getLong("version"));
                     return rs.getLong("version");
                 }
             }

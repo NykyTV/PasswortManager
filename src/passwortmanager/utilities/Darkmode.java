@@ -17,7 +17,7 @@ public class Darkmode {
 
     @Getter
     @Setter
-    private Boolean darkMode = (Boolean) SettingsLoader.loadSettings().get("darkMode");
+    private Boolean darkMode = (Boolean) SettingsLoader.getInstance().isDarkMode();
 
     public void activateDarkMode(boolean active) {
         Color buttonFarbe;
@@ -144,7 +144,7 @@ public class Darkmode {
     public boolean loadDarkModeFromFile() {
         if ((loginUtility != null) || (mainUtility != null)) {
             try{
-                darkMode = (Boolean) SettingsLoader.loadSettings().getOrDefault("darkMode", false);
+                darkMode = (Boolean) SettingsLoader.getInstance().isDarkMode();
             }catch (Exception _) {
                 darkMode = false;
             }

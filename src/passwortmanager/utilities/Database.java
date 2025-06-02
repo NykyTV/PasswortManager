@@ -18,10 +18,10 @@ public class Database {
             throw new RuntimeException("MySQL JDBC Driver nicht gefunden", e);
         }
 
-        JSONObject settings = SettingsLoader.loadSettings();
-        String url = (String) settings.get("url");
-        String user = (String) settings.get("user");
-        String password = (String) settings.get("password");
+        SettingsLoader settings = SettingsLoader.getInstance();
+        String url = settings.getUrl();
+        String user = settings.getUser();
+        String password = settings.getPassword();
 
         try {
             Connection conn = DriverManager.getConnection(url, user, password);

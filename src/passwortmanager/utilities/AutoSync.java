@@ -19,8 +19,7 @@ public class AutoSync {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                JSONObject settings = SettingsLoader.loadSettings();
-                String serverUrl = extractHostFromUrl((String) settings.get("url"));
+                String serverUrl = extractHostFromUrl(SettingsLoader.getInstance().getUrl());
 
                 if (Database.isServerAvailable(serverUrl, mainWindow)) {
                     File file = new File(filename);

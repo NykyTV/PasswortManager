@@ -197,7 +197,6 @@ public class SettingsLoader {
         return true;
     }
 
-    // Geänderte changeMasterPassword-Methode
     public boolean changeMasterPassword(String username, String oldPassword, String newPassword) {
         String filename = Common.getPasswordFilename(username);
 

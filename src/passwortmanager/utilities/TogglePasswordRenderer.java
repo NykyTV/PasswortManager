@@ -1,10 +1,13 @@
 package passwortmanager.utilities;
 
+import lombok.Getter;
+
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-
+@Getter
 public class TogglePasswordRenderer extends JPanel implements TableCellRenderer {
+    private Darkmode darkmodeUtility = new Darkmode(this);
     private JPanel renderPanel;
     private JButton editButton;
     private JButton toggleButton;
@@ -27,6 +30,8 @@ public class TogglePasswordRenderer extends JPanel implements TableCellRenderer 
         editButton.setOpaque(true);
         toggleButton.setOpaque(true);
         copyButton.setOpaque(true);
+
+        darkmodeUtility.activateDarkMode(darkmodeUtility.getDarkMode());
     }
 
     @Override
